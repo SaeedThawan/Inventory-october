@@ -1,7 +1,7 @@
 /* style.css */
 
 body {
-    font-family: 'Arial', sans-serif; /* اختر خطاً مناسباً */
+    font-family: 'Arial', sans-serif; 
 }
 
 /* تحسين شكل الرسائل */
@@ -26,42 +26,41 @@ body {
     border: 1px solid #f5c6cb;
 }
 
-/* تخصيص زر الحذف */
-.remove-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    transition: background-color 0.2s;
-    width: 100%; /* اجعل الزر يملأ الخلية في الهواتف */
-}
-
-.remove-btn:hover {
-    background-color: #c82333;
-}
-
-/* تحسين مظهر الجدول في الهواتف الصغيرة */
-#productsTable th, #productsTable td {
-    white-space: nowrap; /* منع التفاف النصوص في الجدول */
-    padding: 10px 8px;
-}
-
-#productsTable select, #productsTable input[type="text"], 
-#productsTable input[type="number"], #productsTable input[type="date"] {
-    min-width: 100px;
-    font-size: 0.9rem;
-    padding: 5px;
-}
-
-/* إخفاء تسميات الحقول التلقائية في الجدول (الكود والفئة) */
-#productsTable input[readonly] {
-    background-color: #f8f9fa;
-    color: #6c757d;
-}
-
 /* تخصيص البطاقة الرئيسية */
 .card {
     border-radius: 15px;
+}
+
+/* ---------------------------------- */
+/* أنماط بطاقات المنتجات الجديدة (الجرد) */
+/* ---------------------------------- */
+
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px; 
+    border-left: 5px solid var(--bs-primary); /* شريط جانبي أنيق */
+}
+
+/* تأثير عند المرور أو التركيز (للفخامة) */
+.product-card:hover {
+    transform: translateY(-3px); /* ارتفاع بسيط */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important; 
+}
+
+/* تصميم الزر لإضافة المنتج */
+.add-product-btn {
+    border-radius: 20px; 
+    font-weight: bold;
+}
+
+/* تنسيق حقول الإدخال في البطاقات */
+.product-card .form-control, .product-card .form-select {
+    font-size: 0.95rem;
+}
+
+/* حقول القراءة فقط */
+.product-card input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-weight: bold;
 }
