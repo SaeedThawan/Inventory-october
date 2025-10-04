@@ -1,3 +1,9 @@
+// script.js - الكود الكامل والنهائي
+
+// ===================================================
+// 1. الإعدادات والمتغيرات العالمية
+// ===================================================
+
 // يرجى تحديث هذا الرابط برابط Web App الخاص بك في Google Apps Script
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
 
@@ -5,7 +11,7 @@ let PRODUCTS = [];
 let CUSTOMERS = []; 
 
 // ===================================================
-// 2. دوال مساعدة (تحميل، عرض رسائل، تنسيق الوقت)
+// 2. دوال مساعدة (تحميل، عرض رسائل، تنسيق الوقت والتاريخ)
 // ===================================================
 
 /**
@@ -18,11 +24,20 @@ function formatTime(date) {
 }
 
 /**
+ * دالة مساعدة لتنسيق التاريخ الحالي (YYYY-MM-DD)
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+/**
  * تحميل بيانات JSON من مسار ملف معين بطريقة مقاومة للأخطاء
  */
 async function loadJSON(file) {
     try {
-        // نستخدم no-store لتفادي مشاكل التخزين المؤقت
         const res = await fetch(file, {cache: "no-store"}); 
         if (!res.ok) {
             console.error(`ERROR 404: File not found or failed status for ${file}`);
@@ -31,7 +46,6 @@ async function loadJSON(file) {
         
         const data = await res.json();
         
-        // التحقق من أن البيانات هي مصفوفة (التنسيق المتوقع)
         if (!Array.isArray(data)) {
             console.error(`ERROR: JSON in ${file} is not an array.`);
             throw new Error(`خطأ: تنسيق البيانات في ${file} غير صحيح (ليس مصفوفة).`);
@@ -59,7 +73,7 @@ function showMsg(msg, error = false) {
 }
 
 // ===================================================
-// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية
+// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية (بدون تغيير)
 // ===================================================
 
 async function fillSelects() {
@@ -72,21 +86,18 @@ async function fillSelects() {
 
         CUSTOMERS = customersData;
 
-        // تعبئة قائمة المندوبين
         const salesRepSelect = document.getElementById('salesRep');
         salesReps.forEach(repName => {
             const opt = new Option(repName, repName); 
             salesRepSelect.appendChild(opt);
         });
 
-        // تعبئة قائمة المحافظات
         const governorateSelect = document.getElementById('governorate');
         governorates.forEach(govName => {
             const opt = new Option(govName, govName); 
             governorateSelect.appendChild(opt);
         });
 
-        // تعبئة قائمة بيانات العملاء (لـ datalist)
         const customersList = document.getElementById('customersList');
         CUSTOMERS.forEach(cust => {
             const opt = document.createElement('option');
@@ -94,10 +105,8 @@ async function fillSelects() {
             customersList.appendChild(opt);
         });
 
-        // ربط حقل العميل بجلب الكود
         document.getElementById('customer').addEventListener('input', function() {
             const name = this.value;
-            // يتم تعبئة حقل كود العميل (مسموح التعديل به)
             const found = CUSTOMERS.find(c => c.Customer_Name_AR === name);
             document.getElementById('customer_code').value = found ? found.Customer_Code : '';
         });
@@ -118,18 +127,14 @@ async function prepareProducts() {
 }
 
 // ===================================================
-// 4. دوال التعامل مع بطاقات المنتجات (الجرد)
+// 4. دوال التعامل مع بطاقات المنتجات (بدون تغيير)
 // ===================================================
 
-/**
- * إضافة بطاقة منتج جديدة بتصميم أنيق ومرن.
- */
 function addProductRow() {
     const productsBody = document.getElementById('productsBody');
     const productCard = document.createElement('div');
     productCard.classList.add('col-12'); 
     
-    // إعداد قائمة الخيارات المنسدلة للمنتجات
     let options = '<option value="">اختر المنتج...</option>';
     PRODUCTS.forEach(prod => {
         options += `<option value="${prod.Product_Name_AR}">${prod.Product_Name_AR}</option>`;
@@ -194,26 +199,30 @@ function removeProductRow(btn) {
 }
 
 // ===================================================
-// 5. دوال التحقق والإرسال 
+// 5. دوال التحقق والإرسال (تم التعديل)
 // ===================================================
 
 function validateForm() {
     const form = document.getElementById('inventoryForm');
     
-    // 1. تسجيل وقت الخروج تلقائياً عند الضغط على زر الإرسال
-    const exitTime = formatTime(new Date());
-    document.getElementById('exit_time').value = exitTime;
-    document.getElementById('exit_time_display').value = exitTime;
-
-    // 2. التحقق من صلاحية حقول النموذج الرئيسية
+    // 1. التحقق من صلاحية حقول النموذج الرئيسية
     if (!form.checkValidity()) {
         form.reportValidity();
         return false;
     }
 
-    // 3. التحقق من وجود كود العميل
+    // 2. التحقق من وجود كود العميل
     if (!document.getElementById('customer_code').value) {
         showMsg("يرجى إدخال أو اختيار العميل لربط كود العميل!", true);
+        return false;
+    }
+    
+    // 3. التحقق من تسلسل الأوقات (الخروج يجب أن يكون بعد الدخول)
+    const visitTime = document.getElementById('visit_time').value;
+    const exitTime = document.getElementById('exit_time').value;
+
+    if (exitTime <= visitTime) {
+        showMsg("خطأ في الأوقات: يجب أن يكون وقت الخروج بعد وقت الدخول.", true);
         return false;
     }
 
@@ -239,7 +248,6 @@ function validateForm() {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يجب إدخال كمية (كرتون أو باكت) أكبر من الصفر.`, true);
             allProductsValid = false;
         }
-        // تاريخ الانتهاء يتم التحقق منه بواسطة required في HTML
     });
 
     return allProductsValid;
@@ -306,7 +314,6 @@ async function sendRows(rows) {
         showMsg(`✅ تم إرسال جميع المنتجات (${success}) بنجاح!`);
         document.getElementById('inventoryForm').reset();
         document.getElementById('productsBody').innerHTML = "";
-        // إعادة إضافة أول بطاقة منتج بعد إعادة التعيين
         addProductRow(); 
     } else if (success > 0 && failed > 0) {
         showMsg(`⚠️ تم إرسال ${success} منتج بنجاح، وحدثت مشكلة في ${failed} منتج. يرجى مراجعة سجل الأخطاء.`, true);
@@ -316,7 +323,7 @@ async function sendRows(rows) {
 }
 
 // ===================================================
-// 6. مستمعات الأحداث الرئيسية والتنفيذ
+// 6. مستمعات الأحداث الرئيسية والتنفيذ (تم التعديل)
 // ===================================================
 
 document.getElementById('inventoryForm').addEventListener('submit', async function(e){
@@ -332,10 +339,13 @@ document.getElementById('inventoryForm').addEventListener('submit', async functi
 // بداية التحميل - يتم استدعاء الدوال عند تحميل الصفحة بالكامل
 window.addEventListener('DOMContentLoaded', async function() {
     try {
-        // 1. تسجيل وقت الدخول التلقائي
-        const visitTime = formatTime(new Date());
-        document.getElementById('visit_time').value = visitTime;
-        document.getElementById('visit_time_display').value = visitTime;
+        // 1. تسجيل التاريخ ووقت الدخول التلقائي (وقت فتح الرابط)
+        const now = new Date();
+        const initialTime = formatTime(now);
+        const initialDate = formatDate(now);
+        
+        document.getElementById('visit_time').value = initialTime;
+        document.getElementById('visit_date').value = initialDate;
 
         // 2. تحميل البيانات
         await prepareProducts(); 
@@ -344,8 +354,6 @@ window.addEventListener('DOMContentLoaded', async function() {
         // 3. إضافة أول بطاقة منتج
         if (PRODUCTS.length > 0) {
             addProductRow(); 
-        } else {
-            // سيتم عرض رسالة الخطأ في showMsg من دالة prepareProducts
         }
     } catch (e) {
         console.error("فشل التحميل الأولي للبيانات:", e);
