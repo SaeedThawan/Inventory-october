@@ -1,108 +1,110 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>جرد المحلات شهر اكتوبر | شركة جلب العالمية</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج جرد المبيعات</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-light">
+    <div class="container py-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0">سجل جرد ومبيعات المندوب</h3>
+            </div>
+            <div class="card-body p-4">
+                
+                <div id="formMsg" class="msg mb-3" style="display: none;"></div>
+                
+                <form id="inventoryForm">
+                    
+                    <div class="row g-3 mb-4 border-bottom pb-3">
+                        <h5 class="text-primary border-bottom pb-2">بيانات الزيارة</h5>
+                        
+                        <div class="col-md-6">
+                            <label for="entryName" class="form-label">اسم مدخل البيانات:</label>
+                            <input type="text" class="form-control" id="entryName" name="entryName" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="salesRep" class="form-label">مندوب المبيعات:</label>
+                            <select class="form-select" id="salesRep" name="salesRep" required>
+                                <option value="">اختر المندوب...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="governorate" class="form-label">المحافظة:</label>
+                            <select class="form-select" id="governorate" name="governorate" required>
+                                <option value="">اختر المحافظة...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="customer" class="form-label">اسم العميل (البحث التلقائي):</label>
+                            <input type="text" class="form-control" id="customer" name="customer" list="customersList" placeholder="اكتب اسم العميل للبحث..." required>
+                            <datalist id="customersList"></datalist>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="customer_code" class="form-label">كود العميل (تلقائي):</label>
+                            <input type="text" class="form-control bg-light" id="customer_code" name="customer_code" readonly placeholder="يظهر بعد اختيار العميل">
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="visit_time" class="form-label">وقت الدخول:</label>
+                            <input type="time" class="form-control" id="visit_time" name="visit_time" required>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="exit_time" class="form-label">وقت الخروج:</label>
+                            <input type="time" class="form-control" id="exit_time" name="exit_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2 d-flex justify-content-between align-items-center">
+                            جرد المنتجات
+                            <button type="button" class="btn btn-success btn-sm" onclick="addProductRow()">
+                                <i class="bi bi-plus-circle"></i> إضافة منتج جديد
+                            </button>
+                        </h5>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped align-middle" id="productsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>المنتج</th>
+                                        <th>الكود</th>
+                                        <th>الفئة</th>
+                                        <th>كرتون*</th>
+                                        <th>باكت*</th>
+                                        <th>تاريخ الانتهاء</th>
+                                        <th>إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted">*أدخل 0 إذا لم يتوفر.</small>
+                    </div>
 
-<div class="container">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            إرسال بيانات الجرد
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-  <!-- نص ترحيبي -->
-  <h1>شركة جلب العالمية</h1>
-  <div style="color:#333; font-size:1.1rem;margin-bottom:18px;">
-    مرحبًا بك في نظام جرد المحلات لشهر أكتوبر.<br>
-    يرجى تعبئة جميع البيانات بدقة، مع التأكد من جميع الحقول، وإضافة المنتجات بدقة في قسم الجرد.<br>
-    <span style="color:#007bff">أي ملاحظة أو خطأ في الإدخال سيظهر لك تلقائيًا.</span>
-  </div>
-
-  <!-- القسم الأول: مدخل البيانات -->
-  <form id="inventoryForm" autocomplete="off">
-    <div class="section">
-      <h2>1. بيانات المدخل</h2>
-      <label for="entryName">اسم مدخل البيانات <span style="color:red">*</span></label>
-      <input type="text" id="entryName" name="data_entry_name" required placeholder="ادخل اسمك هنا">
-    </div>
-
-    <!-- القسم الثاني: بيانات الموقع والمندوب -->
-    <div class="section">
-      <h2>2. بيانات الموقع والمندوب</h2>
-      <label for="salesRep">اسم المندوب <span style="color:red">*</span></label>
-      <select id="salesRep" name="sales_rep_name" required>
-        <option value="">اختر المندوب...</option>
-      </select>
-      <label for="governorate">المحافظة <span style="color:red">*</span></label>
-      <select id="governorate" name="governorate" required>
-        <option value="">اختر المحافظة...</option>
-      </select>
-      <label for="region">المنطقة / الحي <span style="color:red">*</span></label>
-      <input type="text" id="region" name="region" required placeholder="ادخل اسم المنطقة أو الحي">
-      <label for="address_city">المدينة</label>
-      <input type="text" id="address_city" name="address_city" placeholder="ادخل اسم المدينة">
-      <label for="address_street">اسم الشارع</label>
-      <input type="text" id="address_street" name="address_street" placeholder="ادخل اسم الشارع">
-    </div>
-
-    <!-- القسم الثالث: بيانات العميل -->
-    <div class="section">
-      <h2>3. بيانات العميل</h2>
-      <label for="customer">اختيار العميل <span style="color:red">*</span></label>
-      <input list="customersList" id="customer" name="customer_name" placeholder="ابحث عن اسم العميل..." required>
-      <datalist id="customersList"></datalist>
-      <input type="hidden" id="customer_code" name="customer_code">
-    </div>
-
-    <!-- القسم الرابع: بيانات الزيارة -->
-    <div class="section">
-      <h2>4. تفاصيل الزيارة</h2>
-      <label for="visit_date">تاريخ الزيارة <span style="color:red">*</span></label>
-      <input type="date" id="visit_date" name="visit_date" required>
-      <label for="visit_time">وقت الدخول <span style="color:red">*</span></label>
-      <input type="time" id="visit_time" name="visit_time" required>
-      <label for="exit_time">وقت الخروج <span style="color:red">*</span></label>
-      <input type="time" id="exit_time" name="exit_time" required>
-    </div>
-
-    <!-- القسم الخامس: قسم الجرد -->
-    <div class="section">
-      <h2>5. قسم الجرد (المنتجات)</h2>
-      <button type="button" class="add-btn" onclick="addProductRow()">إضافة منتج</button>
-      <table class="product-table" id="productsTable">
-        <thead>
-          <tr>
-            <th>اسم المنتج</th>
-            <th>كود المنتج</th>
-            <th>الفئة</th>
-            <th>عدد الكراتين</th>
-            <th>عدد الباكتات</th>
-            <th>تاريخ الصلاحية</th>
-            <th>حذف</th>
-          </tr>
-        </thead>
-        <tbody id="productsBody">
-          <!-- يضاف الصف تلقائياً -->
-        </tbody>
-      </table>
-      <div style="color:#888;font-size:0.98em;margin-top:7px;">
-        <span>اضغط "إضافة منتج" لإضافة صف جديد، ويمكنك تعبئة أو تعديل أو حذف أي صف.</span>
-      </div>
-    </div>
-
-    <!-- قسم الملاحظات -->
-    <div class="section">
-      <h2>6. ملاحظات إضافية (اختياري)</h2>
-      <textarea name="suggestions" rows="2" placeholder="ملاحظات أو اقتراحات أخرى..."></textarea>
-    </div>
-
-    <div id="formMsg" class="msg"></div>
-
-    <button type="submit" class="submit-btn">إرسال الجرد</button>
-  </form>
-
-</div>
-
-<script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
