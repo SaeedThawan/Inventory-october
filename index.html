@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>جرد المحلات شهر اكتوبر | شركة جلب العالمية</title>
+  
+  <style>
+    /* تصميم متجاوب وخفيف للجوال والكمبيوتر */
+    :root { --main: #1a73e8; --danger: #c00; --success: #0a0; }
+    * { box-sizing: border-box; }
+    body {
+      background: #f7f7fa; color: #111; font-family: 'Tajawal', Arial, sans-serif;
+      margin: 0; padding: 0;
+    }
+    .container {
+      max-width: 800px; margin: 0 auto; padding: 24px 8px 48px 8px;
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001;
+    }
+    h1, h2, h3 { color: var(--main); margin-top: 0; }
+    .section { margin-bottom: 30px; }
+    label { font-weight: bold; margin-bottom: 6px; display: block; }
+    input, select, textarea, datalist {
+      width: 100%; padding: 7px 10px; margin: 6px 0 14px 0;
+      border: 1px solid #ccc; border-radius: 6px; font-size: 1rem;
+    }
+    .product-table { width: 100%; border-collapse: collapse; margin-top: 10px;}
+    .product-table th, .product-table td {
+      border: 1px solid #eee; padding: 7px; text-align: center;
+    }
+    .product-table th { background: #f2f8ff; }
+    .add-btn, .remove-btn, .submit-btn {
+      background: var(--main); color: #fff; border: none; border-radius: 6px;
+      padding: 8px 18px; font-size: 1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .remove-btn { background: var(--danger); }
+    .add-btn { background: #26b347; margin-bottom: 14px;}
+    .submit-btn { width: 100%; margin-top: 20px; font-size: 1.2rem; }
+    .msg { padding: 10px 0; font-weight: bold; }
+    .msg.error { color: var(--danger); }
+    .msg.success { color: var(--success); }
+    @media (max-width:600px) {
+      .container { padding: 10px 2px 28px 2px; }
+      h1 { font-size: 1.4rem; }
+      h2, h3 { font-size: 1.1rem; }
+      .product-table th, .product-table td { font-size: 0.92rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>شركة جلب العالمية</h1>
+  <div style="color:#333; font-size:1.1rem;margin-bottom:18px;">
+    مرحبًا بك في نظام جرد المحلات لشهر أكتوبر.<br>
+    يرجى تعبئة جميع البيانات بدقة، مع التأكد من جميع الحقول، وإضافة المنتجات بدقة في قسم الجرد.<br>
+    <span style="color:#007bff">أي ملاحظة أو خطأ في الإدخال سيظهر لك تلقائيًا.</span>
+  </div>
+
+  <form id="inventoryForm" autocomplete="off">
+    <div class="section">
+      <h2>1. بيانات المدخل</h2>
+      <label for="entryName">اسم مدخل البيانات <span style="color:red">*</span></label>
+      <input type="text" id="entryName" name="data_entry_name" required placeholder="ادخل اسمك هنا">
+    </div>
+
+    <div class="section">
+      <h2>2. بيانات الموقع والمندوب</h2>
+      <label for="salesRep">اسم المندوب <span style="color:red">*</span></label>
+      <select id="salesRep" name="sales_rep_name" required>
+        <option value="">اختر المندوب...</option>
+      </select>
+      <label for="governorate">المحافظة <span style="color:red">*</span></label>
+      <select id="governorate" name="governorate" required>
+        <option value="">اختر المحافظة...</option>
+      </select>
+      <label for="region">المنطقة / الحي <span style="color:red">*</span></label>
+      <input type="text" id="region" name="region" required placeholder="ادخل اسم المنطقة أو الحي">
+      <label for="address_city">المدينة</label>
+      <input type="text" id="address_city" name="address_city" placeholder="ادخل اسم المدينة">
+      <label for="address_street">اسم الشارع</label>
+      <input type="text" id="address_street" name="address_street" placeholder="ادخل اسم الشارع">
+    </div>
+
+    <div class="section">
+      <h2>3. بيانات العميل</h2>
+      <label for="customer">اختيار العميل <span style="color:red">*</span></label>
+      <input list="customersList" id="customer" name="customer_name" placeholder="ابحث عن اسم العميل..." required>
+      <datalist id="customersList"></datalist>
+      <input type="hidden" id="customer_code" name="customer_code">
+    </div>
+
+    <div class="section">
+      <h2>4. تفاصيل الزيارة</h2>
+      <label for="visit_date">تاريخ الزيارة <span style="color:red">*</span></label>
+      <input type="date" id="visit_date" name="visit_date" required>
+      <label for="visit_time">وقت الدخول <span style="color:red">*</span></label>
+      <input type="time" id="visit_time" name="visit_time" required>
+      <label for="exit_time">وقت الخروج <span style="color:red">*</span></label>
+      <input type="time" id="exit_time" name="exit_time" required>
+    </div>
+
+    <div class="section">
+      <h2>5. قسم الجرد (المنتجات)</h2>
+      <button type="button" class="add-btn" onclick="addProductRow()">إضافة منتج</button>
+      <table class="product-table" id="productsTable">
+        <thead>
+          <tr>
+            <th>اسم المنتج</th>
+            <th>كود المنتج</th>
+            <th>الفئة</th>
+            <th>عدد الكراتين</th>
+            <th>عدد الباكتات</th>
+            <th>تاريخ الصلاحية</th>
+            <th>حذف</th>
+          </tr>
+        </thead>
+        <tbody id="productsBody">
+          </tbody>
+      </table>
+      <div style="color:#888;font-size:0.98em;margin-top:7px;">
+        <span>اضغط "إضافة منتج" لإضافة صف جديد، ويمكنك تعبئة أو تعديل أو حذف أي صف.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>6. ملاحظات إضافية (اختياري)</h2>
+      <textarea name="suggestions" rows="2" placeholder="ملاحظات أو اقتراحات أخرى..."></textarea>
+    </div>
+
+    <div id="formMsg" class="msg"></div>
+
+    <button type="submit" class="submit-btn">إرسال الجرد</button>
+  </form>
+
+</div>
+
+<script>
+  // =========================================================
+  // يرجى تغيير هذا بعنوان URL الخاص بتطبيق الويب (Web App URL)
+  // بعد نشر دالة doPost(e) الخاصة بك.
+  // =========================================================
+  const WEB_APP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID_HERE/exec"; 
+  // =========================================================
+
+  // لإعطاء اسم فريد لكل حقل منتج
+  let productRowCounter = 0; 
+
+  function addProductRow() {
+    const tableBody = document.getElementById('productsBody');
+    const newRow = tableBody.insertRow();
+    productRowCounter++; 
+    
+    // استخدام العداد لإنشاء أسماء حقول فريدة (مثال: product_name_1)
+    newRow.innerHTML = `
+      <td>
+          <input list="productsList" type="text" name="product_name_${productRowCounter}" class="product-name" placeholder="ابحث عن المنتج..." required>
+          <datalist id="productsList"></datalist>
+      </td>
+      <td><input type="text" name="product_code_${productRowCounter}" class="product-code" placeholder="الكود" required></td>
+      <td><input type="text" name="product_category_${productRowCounter}" class="product-category" placeholder="الفئة" required></td>
+      <td><input type="number" name="cartons_count_${productRowCounter}" min="0" value="0" required></td>
+      <td><input type="number" name="packets_count_${productRowCounter}" min="0" value="0" required></td>
+      <td><input type="date" name="expiry_date_${productRowCounter}" required></td>
+      <td><button type="button" class="remove-btn" onclick="removeProductRow(this)">حذف</button></td>
+    `;
+  }
+
+  function removeProductRow(button) {
+    button.closest('tr').remove();
+    // لا نحتاج لإعادة ترقيم العدادات هنا، حيث أن Apps Script ستقوم بمسح الحقول غير المرسلة تلقائيًا.
+  }
+
+  // إضافة صف منتج افتراضي عند تحميل الصفحة
+  window.onload = function() {
+      addProductRow();
+      // هنا يمكنك إضافة منطق جلب البيانات الأولية (المندوبين، العملاء، إلخ.)
+  };
+
+  // دالة الإرسال الرئيسية (جمع البيانات و Fetch)
+  document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const formMsg = document.getElementById('formMsg');
+    
+    const finalData = {};
+    
+    // تجميع كل حقول النموذج (بما في ذلك حقول المنتجات المتسلسلة)
+    formData.forEach((value, key) => {
+      finalData[key] = value;
+    });
+
+    // إضافة حقول إضافية للمساعدة
+    finalData['total_products'] = document.querySelectorAll('#productsBody tr').length;
+    // إضافة وقت الإرسال للمساعدة في التوثيق
+    finalData['timestamp'] = new Date().toLocaleString("ar-SA", { timeZone: "Asia/Riyadh" }); 
+
+    // بناء البيانات للإرسال بصيغة (application/x-www-form-urlencoded)
+    const encodedData = Object.keys(finalData)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(finalData[key]))
+        .join('&');
+
+    // عرض رسالة انتظار
+    formMsg.className = 'msg';
+    formMsg.textContent = '...جارٍ الإرسال، يرجى الانتظار';
+    
+    // إرسال البيانات عبر Fetch API إلى Google Apps Script
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: encodedData
+    })
+    .then(response => response.text())
+    .then(data => {
+      // معالجة استجابة Apps Script
+      if (data.startsWith('✅')) {
+        formMsg.className = 'msg success';
+        form.reset(); 
+        // مسح صفوف المنتجات وإضافة صف جديد بعد النجاح
+        document.getElementById('productsBody').innerHTML = '';
+        productRowCounter = 0;
+        addProductRow();
+      } else {
+        formMsg.className = 'msg error';
+      }
+      formMsg.textContent = data;
+    })
+    .catch(error => {
+      console.error('Fetch Error:', error);
+      formMsg.className = 'msg error';
+      formMsg.textContent = '❌ فشل الإرسال! يرجى التحقق من الاتصال والمحاولة مجدداً.';
+    });
+  });
+</script>
+</body>
+</html>
