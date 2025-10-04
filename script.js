@@ -11,21 +11,15 @@ let PRODUCTS = [];
 let CUSTOMERS = []; 
 
 // ===================================================
-// 2. دوال مساعدة (تحميل، عرض رسائل، تنسيق الوقت والتاريخ)
+// 2. دوال مساعدة (تنسيق الوقت والتاريخ)
 // ===================================================
 
-/**
- * دالة مساعدة لتنسيق الوقت الحالي (ساعة:دقيقة)
- */
 function formatTime(date) {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
 }
 
-/**
- * دالة مساعدة لتنسيق التاريخ الحالي (YYYY-MM-DD)
- */
 function formatDate(date) {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -33,9 +27,8 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-/**
- * تحميل بيانات JSON من مسار ملف معين بطريقة مقاومة للأخطاء
- */
+// ... (بقية دوال loadJSON و showMsg تبقى كما هي) ...
+
 async function loadJSON(file) {
     try {
         const res = await fetch(file, {cache: "no-store"}); 
@@ -58,9 +51,6 @@ async function loadJSON(file) {
     }
 }
 
-/**
- * عرض رسالة للمستخدم (نجاح أو خطأ).
- */
 function showMsg(msg, error = false) {
     const el = document.getElementById('formMsg');
     el.textContent = msg;
@@ -73,7 +63,7 @@ function showMsg(msg, error = false) {
 }
 
 // ===================================================
-// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية (بدون تغيير)
+// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية
 // ===================================================
 
 async function fillSelects() {
@@ -86,6 +76,7 @@ async function fillSelects() {
 
         CUSTOMERS = customersData;
 
+        // ... (تعبئة المندوبين والمحافظات كما هي) ...
         const salesRepSelect = document.getElementById('salesRep');
         salesReps.forEach(repName => {
             const opt = new Option(repName, repName); 
@@ -105,9 +96,11 @@ async function fillSelects() {
             customersList.appendChild(opt);
         });
 
+        // ربط حقل العميل بجلب الكود (يتم إدخاله في الحقل المخفي)
         document.getElementById('customer').addEventListener('input', function() {
             const name = this.value;
             const found = CUSTOMERS.find(c => c.Customer_Name_AR === name);
+            // 💡 يتم تحديث الحقل المخفي (customer_code)
             document.getElementById('customer_code').value = found ? found.Customer_Code : '';
         });
         
@@ -205,28 +198,34 @@ function removeProductRow(btn) {
 function validateForm() {
     const form = document.getElementById('inventoryForm');
     
-    // 1. التحقق من صلاحية حقول النموذج الرئيسية
+    // 1. إذا كان وقت الخروج فارغاً، يتم تعبئته تلقائياً بالوقت الحالي
+    let exitTime = document.getElementById('exit_time').value;
+    if (!exitTime) {
+        exitTime = formatTime(new Date());
+        document.getElementById('exit_time').value = exitTime;
+    }
+
+    // 2. التحقق من صلاحية حقول النموذج الرئيسية
     if (!form.checkValidity()) {
         form.reportValidity();
         return false;
     }
 
-    // 2. التحقق من وجود كود العميل
+    // 3. التحقق من وجود كود العميل (في الحقل المخفي)
     if (!document.getElementById('customer_code').value) {
-        showMsg("يرجى إدخال أو اختيار العميل لربط كود العميل!", true);
+        showMsg("يرجى اختيار العميل لتعبئة كود العميل تلقائياً!", true);
         return false;
     }
     
-    // 3. التحقق من تسلسل الأوقات (الخروج يجب أن يكون بعد الدخول)
+    // 4. التحقق من تسلسل الأوقات (الخروج يجب أن يكون بعد الدخول)
     const visitTime = document.getElementById('visit_time').value;
-    const exitTime = document.getElementById('exit_time').value;
 
     if (exitTime <= visitTime) {
         showMsg("خطأ في الأوقات: يجب أن يكون وقت الخروج بعد وقت الدخول.", true);
         return false;
     }
 
-    // 4. التحقق من تعبئة جميع بيانات المنتجات المطلوبة
+    // 5. التحقق من تعبئة جميع بيانات المنتجات المطلوبة
     const productsBody = document.getElementById('productsBody');
     const productCards = productsBody.children;
 
@@ -280,6 +279,8 @@ function collectRows() {
     return resultRows;
 }
 
+// ... (دوال sendRows ومستمعات الأحداث كما هي) ...
+
 async function sendRows(rows) {
     let success = 0, failed = 0;
     const total = rows.length;
@@ -322,9 +323,6 @@ async function sendRows(rows) {
     }
 }
 
-// ===================================================
-// 6. مستمعات الأحداث الرئيسية والتنفيذ (تم التعديل)
-// ===================================================
 
 document.getElementById('inventoryForm').addEventListener('submit', async function(e){
     e.preventDefault();
