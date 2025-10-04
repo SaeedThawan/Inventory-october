@@ -3,6 +3,8 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0l
 
 // تخزين بيانات المنتجات لمرة واحدة
 let PRODUCTS = [];
+// ✅ إضافة متغير لتخزين بيانات العملاء للمساعدة في البحث عن الكود
+let CUSTOMERS = []; 
 
 /**
  * تحميل بيانات JSON من مسار ملف معين.
@@ -12,7 +14,6 @@ let PRODUCTS = [];
 async function loadJSON(file) {
     const res = await fetch(file);
     if (!res.ok) {
-        // يمكن استخدام console.error بدلاً من throw لعدم إيقاف باقي السكربت
         console.error(`خطأ في تحميل ${file}: ${res.statusText}`);
         throw new Error(`خطأ في تحميل ${file}`);
     }
@@ -24,11 +25,15 @@ async function loadJSON(file) {
  */
 async function fillSelects() {
     try {
-        const [salesReps, governorates, customers] = await Promise.all([
+        // تغيير اسم المتغير المؤقت إلى customersData لتجنب التعارض
+        const [salesReps, governorates, customersData] = await Promise.all([
             loadJSON('sales_representatives.json'),
             loadJSON('governorates.json'),
             loadJSON('customers_main.json'),
         ]);
+
+        // ✅ تخزين بيانات العملاء في المتغير العام
+        CUSTOMERS = customersData;
 
         // تعبئة قائمة المندوبين
         const salesRepSelect = document.getElementById('salesRep');
@@ -46,20 +51,19 @@ async function fillSelects() {
 
         // تعبئة قائمة بيانات العملاء (لـ datalist)
         const customersList = document.getElementById('customersList');
-        customers.forEach(cust => {
+        CUSTOMERS.forEach(cust => {
             const opt = document.createElement('option');
             opt.value = cust.name;
-            opt.setAttribute("data-code", cust.code);
+            // لا حاجة لـ data-code هنا، سنبحث في مصفوفة CUSTOMERS مباشرة
             customersList.appendChild(opt);
         });
 
-        // عند اختيار عميل، جلب الكود تلقائياً
+        // ✅ التعديل لحل مشكلة البحث عن الكود باستخدام المصفوفة المخزنة
         document.getElementById('customer').addEventListener('input', function() {
             const name = this.value;
-            // البحث عن الكود في قائمة العملاء المتاحة
-            const option = customersList.querySelector(`option[value="${name}"]`);
-            const code = option ? option.getAttribute("data-code") : '';
-            document.getElementById('customer_code').value = code;
+            // البحث عن الكود مباشرة في المصفوفة الأصلية المخزنة CUSTOMERS
+            const found = CUSTOMERS.find(c => c.name === name);
+            document.getElementById('customer_code').value = found ? found.code : '';
         });
     } catch (err) {
         console.error("خطأ في تحميل البيانات الأساسية:", err);
@@ -162,7 +166,7 @@ function validateForm() {
         const packet = tr.querySelector('.prod-packet').value;
         
         // التحقق من اختيار المنتج ووجود كمية واحدة على الأقل (كرتون أو حزمة)
-        if (!prodName || (!carton && !packet) || (carton === "0" && packet === "0")) {
+        if (!prodName || (!carton && !packet) || (carton === "0" && packet === "0") || (carton === "" && packet === "")) {
             allProductsValid = false;
         }
     });
