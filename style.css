@@ -1,196 +1,67 @@
-:root {
-  --main: #1a73e8; /* أزرق */
-  --danger: #c00; /* أحمر */
-  --success: #0a0; /* أخضر */
-  --background: #f7f7fa;
-  --input-bg: #fff;
-  --input-border: #ccc;
-}
-
-* {
-  box-sizing: border-box;
-}
+/* style.css */
 
 body {
-  background: var(--background);
-  color: #111;
-  font-family: 'Tajawal', Arial, sans-serif; 
-  margin: 0;
-  padding: 0;
-  direction: rtl; /* ✅ إضافة لدعم اللغة العربية */
-  text-align: right;
+    font-family: 'Arial', sans-serif; /* اختر خطاً مناسباً */
 }
 
-.container {
-  max-width: 900px; /* ✅ زيادة العرض قليلاً */
-  margin: 20px auto;
-  padding: 24px 15px 48px 15px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* ✅ تحسين الظل */
-}
-
-h1, h2, h3 {
-  color: var(--main);
-  margin-top: 0;
-  text-align: center;
-}
-
-/* --- تنسيق حقول النموذج الرئيسية --- */
-fieldset {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 25px;
-    border-radius: 6px;
-}
-
-legend {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: var(--main);
-    padding: 0 10px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* ✅ استخدام Grid لتنسيق حقول البيانات الرئيسية بشكل متناسق */
-form > fieldset:not(.products-fieldset) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: 6px;
-  display: block;
-  color: #555;
-}
-
-/* تم إزالة datalist من المحدد لعدم وجودها كعنصر مرئي يمكن تنسيقه */
-input, select, textarea {
-  width: 100%;
-  padding: 8px 12px;
-  margin: 0; /* ✅ تم إزالة الهامش العلوي والسفلي الزائد */
-  border: 1px solid var(--input-border);
-  border-radius: 6px;
-  font-size: 1rem;
-  background: var(--input-bg);
-  transition: border 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: var(--main);
-  outline: none;
-}
-
-/* --- جدول المنتجات (تم تعديل الكلاس إلى ID) --- */
-/* ✅ التغيير من .product-table إلى #productsTable للتوافق مع index.html */
-#productsTable { 
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-#productsTable th, #productsTable td {
-  border: 1px solid #eee;
-  padding: 7px;
-  text-align: center;
-}
-
-#productsTable th {
-  background: #f2f8ff;
-}
-
-/* تحسين تنسيق حقول الجدول */
-#productsTable input, #productsTable select {
-    padding: 6px 8px;
-    margin: 0;
-}
-
-/* --- الأزرار --- */
-.add-btn, .remove-btn, .submit-btn {
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 18px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.remove-btn {
-  background: var(--danger);
-  padding: 6px 10px;
-}
-
-.add-btn {
-  background: #26b347;
-  margin-top: 15px; /* ✅ إضافة هامش علوي ليتناسب مع الجدول */
-  margin-bottom: 14px;
-}
-
-.submit-btn {
-  width: 100%;
-  margin-top: 25px; /* ✅ زيادة الهامش العلوي */
-  font-size: 1.2rem;
-  background: var(--main);
-}
-
-.add-btn:hover { background: #1f943a; }
-.remove-btn:hover { background: #a00; }
-.submit-btn:hover { background: #1459b3; }
-
-
-/* --- رسائل الحالة --- */
+/* تحسين شكل الرسائل */
 .msg {
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 6px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.msg.error {
-  color: var(--danger);
-  background-color: #ffe6e6; /* ✅ إضافة لون خلفية لتنسيق الخطأ */
-  border: 1px solid var(--danger);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .msg.success {
-  color: var(--success);
-  background-color: #e6ffe6; /* ✅ إضافة لون خلفية لتنسيق النجاح */
-  border: 1px solid var(--success);
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
-/* تنسيق للنجوم المطلوبة (إن وجدت) */
-.required {
-    color: var(--danger);
-    margin-right: 3px;
-    font-size: 0.9em;
+.msg.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
-/* --- استجابة الشاشة (Media Query) --- */
-@media (max-width:650px) {
-  .container {
-    padding: 10px 5px 28px 5px;
-  }
-  h1 {
-    font-size: 1.4rem;
-  }
-  #productsTable th, #productsTable td {
+/* تخصيص زر الحذف */
+.remove-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
     font-size: 0.85rem;
+    transition: background-color 0.2s;
+    width: 100%; /* اجعل الزر يملأ الخلية في الهواتف */
+}
+
+.remove-btn:hover {
+    background-color: #c82333;
+}
+
+/* تحسين مظهر الجدول في الهواتف الصغيرة */
+#productsTable th, #productsTable td {
+    white-space: nowrap; /* منع التفاف النصوص في الجدول */
+    padding: 10px 8px;
+}
+
+#productsTable select, #productsTable input[type="text"], 
+#productsTable input[type="number"], #productsTable input[type="date"] {
+    min-width: 100px;
+    font-size: 0.9rem;
     padding: 5px;
-  }
-  /* لتمكين التمرير الأفقي في الجدول على الجوال */
-  .products-fieldset {
-      overflow-x: auto;
-  }
-  #productsTable {
-      min-width: 600px; /* ضمان أن الجدول يمتد ليسمح بالتمرير */
-  }
+}
+
+/* إخفاء تسميات الحقول التلقائية في الجدول (الكود والفئة) */
+#productsTable input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+/* تخصيص البطاقة الرئيسية */
+.card {
+    border-radius: 15px;
 }
