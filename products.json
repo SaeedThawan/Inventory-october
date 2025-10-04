@@ -76,7 +76,7 @@
   },
   {
     "Product_Code": "301005",
-    "Product_Name_AR": "مونزا  شوكو لاته 12×24×25جم",
+    "Product_Name_AR": "مونزا شوكو لاته 12×24×25جم",
     "Category": "الشوكولاتة"
   },
   {
@@ -142,46 +142,6 @@
   {
     "Product_Code": "401008",
     "Product_Name_AR": "جيلي جلب غابه 12×24×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401051",
-    "Product_Name_AR": "جيلي جلب كولا 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401052",
-    "Product_Name_AR": "جيلي جلب جماجم 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401053",
-    "Product_Name_AR": "جيلي جلب وورمز 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401054",
-    "Product_Name_AR": "جيلي جلب عظام 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401055",
-    "Product_Name_AR": "جيلي جلب توت 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401056",
-    "Product_Name_AR": "جيلي جلب قلوب 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401057",
-    "Product_Name_AR": "جيلي جلب فواكه 24×12×14جم",
-    "Category": "جيلي"
-  },
-  {
-    "Product_Code": "401058",
-    "Product_Name_AR": "جيلي جلب غابه 24×12×14جم",
     "Category": "جيلي"
   },
   {
@@ -495,11 +455,6 @@
     "Category": "البسكويت"
   },
   {
-    "Product_Code": "505073",
-    "Product_Name_AR": "بسكويت ديجستف بيكاديلي مغطى بالشكولاته 6×24×20جم",
-    "Category": "البسكويت"
-  },
-  {
     "Product_Code": "505075",
     "Product_Name_AR": "بسكويت ديجستف اصابع مغطى بالشكولاته 36×8×28جم",
     "Category": "البسكويت"
@@ -507,11 +462,6 @@
   {
     "Product_Code": "505076",
     "Product_Name_AR": "بسكويت بيكاديلي يموو كوكيز رقائق شوكولاته 6×24×20جم",
-    "Category": "البسكويت"
-  },
-  {
-    "Product_Code": "505077",
-    "Product_Name_AR": "بسكويت بيكاديلي يموو كوكيز رقائق شوكولاته 24×12×20جم",
     "Category": "البسكويت"
   },
   {
@@ -532,11 +482,6 @@
   {
     "Product_Code": "505087",
     "Product_Name_AR": "سبلاش بسكويت مغطى بالشوكلاته توين 12×24×16جم",
-    "Category": "البسكويت"
-  },
-  {
-    "Product_Code": "505088",
-    "Product_Name_AR": "سبلاش بسكويت نصف مغلف بالشوكلاته 24×12×22جم",
     "Category": "البسكويت"
   },
   {
@@ -615,18 +560,8 @@
     "Category": "البسكويت"
   },
   {
-    "Product_Code": "601251",
-    "Product_Name_AR": "توركو تام بسكويت دايجستيبل بالقمح الكامل14×3×131جم",
-    "Category": "البسكويت"
-  },
-  {
     "Product_Code": "601252",
     "Product_Name_AR": "توركو تام بسكويت شوكولاته 12×3×83جم",
-    "Category": "البسكويت"
-  },
-  {
-    "Product_Code": "601272",
-    "Product_Name_AR": "توركو تام بسكويت شوكولاته 6×24×46جم",
     "Category": "البسكويت"
   },
   {
@@ -660,14 +595,89 @@
     "Category": "المشروبات"
   },
   {
-    "Product_Code": "701091",
-    "Product_Name_AR": "كارباو مشروب الطاقه 24×250مل",
-    "Category": "المشروبات"
+    "Product_Code": "1101071",
+    "Product_Name_AR": "مازولا سمن نباتي بطعم الزبد 6 × 1.6 لتر",
+    "Category": "زيوت"
   },
   {
-    "Product_Code": "701100",
-    "Product_Name_AR": "كارباو مشروب الطاقه غازي 24×330مل",
-    "Category": "المشروبات"
+    "Product_Code": "1102007",
+    "Product_Name_AR": "شاي ليبتون العلامة الصفراء 48 ×100×2جم",
+    "Category": "مشروبات_ساخنة"
+  },
+  {
+    "Product_Code": "1200100",
+    "Product_Name_AR": "بطاطس مستر شيبس 5×21×13جم",
+    "Category": "سناكس"
+  },
+  {
+    "Product_Code": "1200101",
+    "Product_Name_AR": "بطاطس مستر شيبس البابريكا 5×21×13جم",
+    "Category": "سناكس"
+  },
+  {
+    "Product_Code": "1200102",
+    "Product_Name_AR": "بطاطس مستر شيبس جبن فرنسي  5×21×13جم",
+    "Category": "سناكس"
+  },
+  {
+    "Product_Code": "1200151",
+    "Product_Name_AR": "سناك مكس البابريكا 5×20×14جم",
+    "Category": "سناكس"
+  },
+  {
+    "Product_Code": "1200152",
+    "Product_Name_AR": "سناك مكس جبن فرنسي  5×20×14جم",
+    "Category": "سناكس"
+  },
+  {
+    "Product_Code": "1200200",
+    "Product_Name_AR": "حلوى جوسي دروب  بنكهة  الفراولة 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200201",
+    "Product_Name_AR": "حلوى جوسي دروب  بنكهة الكولا  16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200202",
+    "Product_Name_AR": "حلوى جوسي دروب  توت العليق 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200203",
+    "Product_Name_AR": "حلوى جوسي دروب  الكشمش الاسود 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200231",
+    "Product_Name_AR": "حلوى جوسي دروب ساور إكستريم بنكهة الكرز الحامض 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200251",
+    "Product_Name_AR": "حلوى بيج بيبي الفراولة و الكشمش الاسود  16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200252",
+    "Product_Name_AR": "حلوى بيج بيبي بوب توت العليق 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200253",
+    "Product_Name_AR": "حلوى بيج بيبي بوب بنكهة التوت الحامض 16×12",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200271",
+    "Product_Name_AR": "حلوى  بوش بوب بنكهة  توت العليق  بنكهة الكولا 20×20",
+    "Category": "حلويات"
+  },
+  {
+    "Product_Code": "1200272",
+    "Product_Name_AR": "حلوى بوش بوب ديو بنكهة الفراولة والكولا والكشمش الاسود 20×20",
+    "Category": "حلويات"
   },
   {
     "Product_Code": "901001",
@@ -690,18 +700,8 @@
     "Category": "حلويات"
   },
   {
-    "Product_Code": "901051",
-    "Product_Name_AR": "لولي بوب ماكسي بطيخ 10×48×28جم",
-    "Category": "حلويات"
-  },
-  {
     "Product_Code": "901052",
     "Product_Name_AR": "لولي بوب منيا ماكسي فراوله 10×48×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "901053",
-    "Product_Name_AR": "لولي بوب مانيا ماكسي كرز 10×48×28جم",
     "Category": "حلويات"
   },
   {
@@ -810,87 +810,12 @@
     "Category": "جيلي"
   },
   {
-    "Product_Code": "906001",
-    "Product_Name_AR": "لولي بوب ماكسي بطيخ 12×24×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906002",
-    "Product_Name_AR": "لولي بوب ماكسي فراوله 12×24×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906003",
-    "Product_Name_AR": "لولي بوب مانيا ماكسي كرز 12×24×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906051",
-    "Product_Name_AR": "لولي بوب ماكسي بطيخ 10×48×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906052",
-    "Product_Name_AR": "لولي بوب منيا ماكسي فراوله 10×48×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906053",
-    "Product_Name_AR": "لولي بوب مانيا ماكسي كرز 10×48×28جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906102",
-    "Product_Name_AR": "لولي بوب ميني فراوله 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906103",
-    "Product_Name_AR": "لولي بوب مانيا كرز 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906106",
-    "Product_Name_AR": "لولي بوب منيا فواكه استوائيه 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906109",
-    "Product_Name_AR": "لولي بوب مانيا نابوليتانو 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906111",
-    "Product_Name_AR": "لولي بوب مانيا اكسترا لون للسان 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906112",
-    "Product_Name_AR": "لولي بوب تي ان تي نكهات منوعه 20×50×12جم",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "906201",
-    "Product_Name_AR": "جيلي جوماتشو فواكه منوعه 15باكت ×30حبه",
-    "Category": "جيلي"
-  },
-  {
     "Product_Code": "1001011",
     "Product_Name_AR": "حلوى جيلي تيارا نكهة الفراولة 24×6×85 جرام",
     "Category": "تيارا"
   },
   {
-    "Product_Code": "1001012",
-    "Product_Name_AR": "حلوى الجيلي نكهة الفراولة تيارا 24×6×85 جرام",
-    "Category": "تيارا"
-  },
-  {
     "Product_Code": "1001021",
-    "Product_Name_AR": "كريم كراميل تيارا 12×6×71 جرام",
-    "Category": "تيارا"
-  },
-  {
-    "Product_Code": "1001022",
     "Product_Name_AR": "كريم كراميل تيارا 12×6×71 جرام",
     "Category": "تيارا"
   },
@@ -905,18 +830,8 @@
     "Category": "تيارا"
   },
   {
-    "Product_Code": "1001052",
-    "Product_Name_AR": "مزيج كريمة المخفوقة تيارا 4×6×72 جم",
-    "Category": "تيارا"
-  },
-  {
     "Product_Code": "1001061",
     "Product_Name_AR": "باكينع باودر تيارا  6×12×110جم",
-    "Category": "تيارا"
-  },
-  {
-    "Product_Code": "1001062",
-    "Product_Name_AR": "باكينغ باودر تيارا  6×12×110جم",
     "Category": "تيارا"
   },
   {
@@ -928,101 +843,5 @@
     "Product_Code": "1001071",
     "Product_Name_AR": "نكهة طهي تيارا  فانيلا 6×12×28 مل",
     "Category": "تيارا"
-  },
-  {
-    "Product_Code": "1001072",
-    "Product_Name_AR": "نكهة طهي فانيللا تيارا  فانيلا 6×12×28 مل",
-    "Category": "تيارا"
-  },
-  {
-    "Product_Code": "1101071",
-    "Product_Name_AR": "مازولا سمن نباتي بطعم الزبد 6 × 1.6 لتر",
-    "Category": "زيوت"
-  },
-  {
-    "Product_Code": "1101072",
-    "Product_Name_AR": "مازولا سمن نباتي بطعم الزبد 12*800 مل",
-    "Category": "زيوت"
-  },
-  {
-    "Product_Code": "1102007",
-    "Product_Name_AR": "شاي ليبتون العلامة الصفراء 48 ×100×2جم",
-    "Category": "مشروبات_ساخنة"
-  },
-  {
-    "Product_Code": "1200100",
-    "Product_Name_AR": "بطاطس مستر شيبس 5×21×13جم",
-    "Category": "سناكس"
-  },
-  {
-    "Product_Code": "1200101",
-    "Product_Name_AR": "بطاطس مستر شيبس البابريكا 5×21×13جم",
-    "Category": "سناكس"
-  },
-  {
-    "Product_Code": "1200102",
-    "Product_Name_AR": "بطاطس مستر شيبس جبن فرنسي  5×21×13جم",
-    "Category": "سناكس"
-  },
-  {
-    "Product_Code": "1200151",
-    "Product_Name_AR": "سناك مكس البابريكا 5×20×14جم",
-    "Category": "سناكس"
-  },
-  {
-    "Product_Code": "1200152",
-    "Product_Name_AR": "سناك مكس جبن فرنسي  5×20×14جم",
-    "Category": "سناكس"
-  },
-  {
-    "Product_Code": "1200200",
-    "Product_Name_AR": "حلوى جوسي دروب  بنكهة  الفراولة 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200201",
-    "Product_Name_AR": "حلوى جوسي دروب  بنكهة الكولا  16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200202",
-    "Product_Name_AR": "حلوى جوسي دروب  توت العليق 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200203",
-    "Product_Name_AR": "حلوى جوسي دروب  الكشمش الاسود 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200231",
-    "Product_Name_AR": "حلوى جوسي دروب ساور إكستريم بنكهة الكرز الحامض 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200251",
-    "Product_Name_AR": "حلوى بيج بيبي الفراولة و الكشمش الاسود  16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200252",
-    "Product_Name_AR": "حلوى بيج بيبي بوب توت العليق 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200253",
-    "Product_Name_AR": "حلوى بيج بيبي بوب بنكهة التوت الحامض 16×12",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200271",
-    "Product_Name_AR": "حلوى  بوش بوب بنكهة  توت العليق  بنكهة الكولا 20×20",
-    "Category": "حلويات"
-  },
-  {
-    "Product_Code": "1200272",
-    "Product_Name_AR": "حلوى بوش بوب ديو بنكهة الفراولة والكولا والكشمش الاسود 20×20",
-    "Category": "حلويات"
   }
-
 ]
