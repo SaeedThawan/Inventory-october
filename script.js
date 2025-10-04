@@ -1,4 +1,4 @@
-// script.js - الكود الموحد والنهائي
+// script.js - الكود الموحد والنهائي مع تصحيح تحميل البيانات
 
 // ===================================================
 // 1. الإعدادات والمتغيرات العالمية
@@ -14,18 +14,31 @@ let CUSTOMERS = [];
 // 2. دوال مساعدة (تحميل وعرض رسائل)
 // ===================================================
 
+/**
+ * تحميل بيانات JSON من مسار ملف معين بطريقة مقاومة للأخطاء
+ */
 async function loadJSON(file) {
     try {
-        const res = await fetch(file);
+        // نستخدم no-store لتفادي مشاكل التخزين المؤقت
+        const res = await fetch(file, {cache: "no-store"}); 
         if (!res.ok) {
-            console.error(`خطأ في تحميل ${file}: ${res.statusText}`);
-            throw new Error(`خطأ في تحميل ${file}`);
+            // هذا الخطأ سيظهر إذا كان الملف غير موجود (404)
+            console.error(`ERROR 404: File not found or failed status for ${file}`);
+            throw new Error(`لم يتم العثور على الملف: ${file}`);
         }
-        return await res.json();
+        
+        const data = await res.json();
+        
+        // التحقق من أن البيانات هي مصفوفة، وهو التنسيق المتوقع
+        if (!Array.isArray(data)) {
+            console.error(`ERROR: JSON in ${file} is not an array.`);
+            throw new Error(`خطأ: تنسيق البيانات في ${file} غير صحيح (ليس مصفوفة).`);
+        }
+        
+        return data;
     } catch (error) {
-        // نستخدم 'throw' لإيقاف التنفيذ وإظهار رسالة خطأ للمستخدم
-        console.error(`فشل في الاتصال أو تحليل ${file}:`, error);
-        throw new Error(`فشل في تحميل بيانات ${file}.`);
+        console.error(`FATAL ERROR loading ${file}:`, error);
+        throw new Error(`فشل حاسم في تحميل البيانات من ${file}.`);
     }
 }
 
@@ -46,6 +59,7 @@ function showMsg(msg, error = false) {
 
 async function fillSelects() {
     try {
+        // نستخدم Promise.all لتحميل جميع البيانات الرئيسية بالتوازي
         const [salesReps, governorates, customersData] = await Promise.all([
             loadJSON('sales_representatives.json'), 
             loadJSON('governorates.json'),         
@@ -68,7 +82,7 @@ async function fillSelects() {
             governorateSelect.appendChild(opt);
         });
 
-        // تعبئة قائمة بيانات العملاء (لـ datalist - البحث السريع)
+        // تعبئة قائمة بيانات العملاء (لـ datalist)
         const customersList = document.getElementById('customersList');
         CUSTOMERS.forEach(cust => {
             const opt = document.createElement('option');
@@ -84,9 +98,9 @@ async function fillSelects() {
         });
         
     } catch (err) {
-        // عرض رسالة الخطأ العامة التي تم توليدها في loadJSON
+        // عرض رسالة الخطأ التي تم توليدها في loadJSON وإيقاف التنفيذ
         showMsg(err.message + " يرجى التأكد من ملفات JSON.", true);
-        throw err; // إعادة رمي الخطأ لإيقاف التنفيذ إذا فشل التحميل
+        throw err; 
     }
 }
 
@@ -95,7 +109,7 @@ async function prepareProducts() {
         PRODUCTS = await loadJSON('products.json');
     } catch (err) {
         showMsg(err.message + " يرجى التأكد من ملف products.json.", true);
-        throw err; // إعادة رمي الخطأ
+        throw err;
     }
 }
 
@@ -113,7 +127,8 @@ function addProductRow() {
     
     // إعداد قائمة الخيارات المنسدلة للمنتجات
     let options = '<option value="">اختر المنتج...</option>';
-    // 💡 استخدام مصفوفة المنتجات المملوءة
+    
+    // 💡 استخدام أسماء الخصائص التي أكدت أنها صحيحة لديك
     PRODUCTS.forEach(prod => {
         options += `<option value="${prod.Product_Name_AR}">${prod.Product_Name_AR}</option>`;
     });
@@ -166,6 +181,7 @@ function addProductRow() {
 
     productCard.querySelector('.prod-name').addEventListener('change', function(){
         const name = this.value;
+        // 💡 استخدام أسماء الخصائص التي أكدت أنها صحيحة لديك
         const prod = PRODUCTS.find(p => p.Product_Name_AR === name);
         productCard.querySelector('.prod-code').value = prod ? prod.Product_Code : '';
         productCard.querySelector('.prod-cat').value = prod ? prod.Category : '';
@@ -177,11 +193,10 @@ function removeProductRow(btn) {
 }
 
 // ===================================================
-// 5. دوال الإرسال (بدون تغيير)
+// 5. دوال التحقق والإرسال 
 // ===================================================
 
 function validateForm() {
-    // ... (كود التحقق كما هو) ...
     const form = document.getElementById('inventoryForm');
     if (!form.checkValidity()) {
         form.reportValidity();
@@ -313,17 +328,15 @@ window.addEventListener('DOMContentLoaded', async function() {
     try {
         // تحميل بيانات المنتجات أولاً، ثم البيانات الأساسية
         await prepareProducts(); 
-        await fillSelects(); 
+        await fillSelects();     
         
-        // إضافة أول بطاقة منتج بعد تحميل البيانات
+        // إضافة أول بطاقة منتج بعد تحميل المنتجات بنجاح
         if (PRODUCTS.length > 0) {
             addProductRow(); 
         } else {
-            // هذا يحدث فقط إذا فشل تحميل المنتجات (تم معالجته برسالة في prepareProducts)
-            showMsg("❌ فشل في تحميل المنتجات. لن يعمل قسم الجرد.", true);
+            // سيتم عرض رسالة الخطأ في showMsg من دالة prepareProducts
         }
     } catch (e) {
-        // إذا حدث خطأ أثناء تحميل أي JSON، سيتم عرض رسالة الخطأ بالفعل
         console.error("فشل التحميل الأولي للبيانات:", e);
     }
 });
