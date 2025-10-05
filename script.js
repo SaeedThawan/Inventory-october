@@ -1,495 +1,364 @@
-/* script.js */
+// script.js - الكود الكامل والنهائي
 
-// ✅ رابط Google Apps Script (المُرسَل والمُعتمد الآن)
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkoTCwAy9qWp0yelFhBC1QpXT_cmiE-Kosu5NgdU1rfoSfxVmuEHIlSA2PU_dPshSU/exec";
+// ===================================================
+// 1. الإعدادات والمتغيرات العالمية
+// ===================================================
 
-// ثوابت تحميل البيانات (يفترض وجود هذه الملفات بجانب ملف HTML)
-const PRODUCTS_JSON_URL = "products.json";
-const CUSTOMERS_JSON_URL = "customers_main.json";
-const GOVERNORATES_JSON_URL = "governorates.json";
-const SALES_REPRESENTATIVES_JSON_URL = "sales_representatives.json";
+// 🛑 تأكد من تحديث هذا الرابط برابط Web App الجديد والنهائي بعد النشر
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec"; 
 
-// متغيرات عامة
-let productsData = [];
-let customersData = [];
-let productIndex = 0; 
+let PRODUCTS = [];
+let CUSTOMERS = []; 
 
-// عناصر النموذج
-const form = document.getElementById("inventoryForm");
-const addProductBtn = document.getElementById("addProductBtn");
-const productsBody = document.getElementById("productsBody");
+// ===================================================
+// 2. دوال مساعدة
+// ===================================================
 
-
-// ===========================================
-// دوال المساعدة
-// ===========================================
-
-// دالة استخراج عدد البواكت من اسم المنتج
-function extractPacksPerCarton(productName) {
-  const match = productName.match(/(\d+)\s*×/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return null;
+function formatTime(date) {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
 }
 
-// تعيين التاريخ والوقت الحالي كقيم افتراضية
-function setDefaultDateTime() {
-  const now = new Date();
-  const dateInput = document.getElementById("visit_date");
-  const timeInput = document.getElementById("visit_time");
-  const exitTimeInput = document.getElementById("exit_time");
-
-  const pad = (num) => num.toString().padStart(2, '0');
-
-  // تهيئة التاريخ (YYYY-MM-DD)
-  const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  dateInput.value = dateStr;
-
-  // تهيئة الوقت (HH:MM)
-  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  timeInput.value = timeStr;
-  exitTimeInput.value = timeStr;
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
-// ===========================================
-// تحميل البيانات
-// ===========================================
-
-async function loadData() {
-  try {
-    // تحميل البيانات من ملفات JSON
-    const [prodRes, custRes, govRes, repRes] = await Promise.all([
-        fetch(PRODUCTS_JSON_URL),
-        fetch(CUSTOMERS_JSON_URL),
-        fetch(GOVERNORATES_JSON_URL),
-        fetch(SALES_REPRESENTATIVES_JSON_URL)
-    ]);
-
-    productsData = await prodRes.json();
-    customersData = await custRes.json();
-    const governorates = await govRes.json();
-    const reps = await repRes.json();
-
-    // تعبئة المحافظات
-    const govSelect = document.getElementById("governorate");
-    governorates.forEach(name => {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      govSelect.appendChild(opt);
-    });
-
-    // تعبئة المندوبين
-    const repSelect = document.getElementById("salesRep");
-    reps.forEach(name => {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      repSelect.appendChild(opt);
-    });
-
-    // تعبئة قائمة العملاء (datalist)
-    const customersList = document.getElementById("customersList");
-    customersData.forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c.Customer_Name_AR;
-      opt.dataset.code = c.Customer_Code;
-      customersList.appendChild(opt);
-    });
-
-    // ربط اسم العميل بكوده
-    const customerInput = document.getElementById("customer");
-    const customerCode = document.getElementById("customer_code");
-    customerInput.addEventListener("input", () => {
-      const selected = [...customersList.options].find(opt => opt.value === customerInput.value);
-      customerCode.value = selected ? selected.dataset.code : "";
-      updateSummary();
-    });
-
-    setDefaultDateTime();
-    addProductRow(); // إضافة أول صف منتج
-    updateSummary();
-  } catch (err) {
-    showMsg(`خطأ في تحميل البيانات الأساسية (ملفات JSON): ${err.message}`, 'error');
-    console.error("خطأ في تحميل البيانات:", err);
-  }
+async function loadJSON(file) {
+    try {
+        const res = await fetch(file, {cache: "no-store"}); 
+        if (!res.ok) {
+            throw new Error(`لم يتم العثور على الملف: ${file}`);
+        }
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+            throw new Error(`خطأ: تنسيق البيانات في ${file} غير صحيح (ليس مصفوفة).`);
+        }
+        return data;
+    } catch (error) {
+        console.error(`FATAL ERROR loading ${file}:`, error);
+        throw new Error(`فشل حاسم في تحميل البيانات من ${file}.`);
+    }
 }
 
-// ===========================================
-// إدارة المنتجات الديناميكية والملخص
-// ===========================================
+function showMsg(msg, error = false) {
+    const el = document.getElementById('formMsg');
+    el.textContent = msg;
+    el.className = "msg" + (error ? " error" : " success");
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!error) {
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+}
 
-// إضافة بطاقة منتج
+// ===================================================
+// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية
+// ===================================================
+
+async function fillSelects() {
+    try {
+        const [salesReps, governorates, customersData] = await Promise.all([
+            loadJSON('sales_representatives.json'), 
+            loadJSON('governorates.json'), 
+            loadJSON('customers_main.json'), 
+        ]);
+
+        CUSTOMERS = customersData;
+
+        // تعبئة المندوبين والمحافظات
+        const salesRepSelect = document.getElementById('salesRep');
+        salesReps.forEach(repName => {
+            salesRepSelect.appendChild(new Option(repName, repName));
+        });
+
+        const governorateSelect = document.getElementById('governorate');
+        governorates.forEach(govName => {
+            governorateSelect.appendChild(new Option(govName, govName));
+        });
+
+        // تعبئة قائمة العملاء
+        const customersList = document.getElementById('customersList');
+        CUSTOMERS.forEach(cust => {
+            const opt = document.createElement('option');
+            opt.value = cust.Customer_Name_AR; 
+            customersList.appendChild(opt);
+        });
+
+        // ربط حقل العميل بجلب الكود
+        document.getElementById('customer').addEventListener('input', function() {
+            const name = this.value;
+            const found = CUSTOMERS.find(c => c.Customer_Name_AR === name);
+            // يتم تحديث الحقل المخفي (customer_code)
+            document.getElementById('customer_code').value = found ? found.Customer_Code : '';
+        });
+        
+    } catch (err) {
+        showMsg(err.message + " يرجى التأكد من ملفات JSON.", true);
+        throw err; 
+    }
+}
+
+async function prepareProducts() {
+    try {
+        PRODUCTS = await loadJSON('products.json');
+    } catch (err) {
+        showMsg(err.message + " يرجى التأكد من ملف products.json.", true);
+        throw err;
+    }
+}
+
+// ===================================================
+// 4. دوال التعامل مع بطاقات المنتجات
+// ===================================================
+
 function addProductRow() {
-  productIndex++;
-  
-  const col = document.createElement("div");
-  col.className = "col-md-6 product-card";
+    const productsBody = document.getElementById('productsBody');
+    const productCard = document.createElement('div');
+    productCard.classList.add('col-12'); 
+    
+    let options = '<option value="">اختر المنتج...</option>';
+    PRODUCTS.forEach(prod => {
+        options += `<option value="${prod.Product_Name_AR}">${prod.Product_Name_AR}</option>`;
+    });
 
-  col.innerHTML = `
-    <div class="card mb-3 shadow-sm">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 class="text-primary mb-0">منتج #${productIndex}</h6>
-          <button type="button" class="btn btn-outline-danger btn-sm" data-action="remove">🗑️ حذف</button>
+    productCard.innerHTML = `
+        <div class="card product-card shadow-sm border-info">
+            <div class="card-body p-3">
+                
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="flex-grow-1 me-3">
+                        <label class="form-label fw-bold">اسم المنتج:</label>
+                        <select class="prod-name form-select" required>${options}</select>
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline-danger btn-sm align-self-center" onclick="removeProductRow(this)">
+                        حذف
+                    </button>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4 col-6">
+                        <label class="form-label small text-muted">الكود:</label>
+                        <input type="text" class="prod-code form-control form-control-sm bg-light" readonly placeholder="الكود">
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <label class="form-label small text-muted">الفئة:</label>
+                        <input type="text" class="prod-cat form-control form-control-sm bg-light" readonly placeholder="الفئة">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="" class="form-label small text-muted">تاريخ الانتهاء:</label>
+                        <input type="date" class="prod-expiry form-control form-control-sm" required>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label fw-bold">عدد الكراتين:</label>
+                        <input type="number" class="prod-carton form-control" min="0" value="0" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold">عدد الباكت:</label>
+                        <input type="number" class="prod-packet form-control" min="0" value="0" required>
+                    </div>
+                </div>
+
+            </div>
         </div>
+    `;
+    productsBody.appendChild(productCard);
 
-        <div class="mb-2">
-          <label class="form-label">اسم المنتج:</label>
-          <input type="text" class="form-control product-input" list="productsList_${productIndex}" placeholder="ابحث عن المنتج..." required>
-          <datalist id="productsList_${productIndex}"></datalist>
-          <input type="hidden" name="product_code_${productIndex}" class="product-code">
-        </div>
+    productCard.querySelector('.prod-name').addEventListener('change', function(){
+        const name = this.value;
+        const prod = PRODUCTS.find(p => p.Product_Name_AR === name);
+        productCard.querySelector('.prod-code').value = prod ? prod.Product_Code : '';
+        productCard.querySelector('.prod-cat').value = prod ? prod.Category : '';
+    });
+}
 
-        <div class="mt-2">
-          <label class="form-label">عدد العبوة (باكت/كرتون):</label>
-          <input type="text" class="form-control unit-input" name="unit_${productIndex}" readonly>
-        </div>
-
-        <div class="row g-2 mt-2">
-          <div class="col-md-6">
-            <label class="form-label">الكمية (كرتون):</label>
-            <input type="number" class="form-control cartons-input" name="cartons_${productIndex}" min="0" value="0" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">الكمية (باكت):</label>
-            <input type="number" class="form-control packs-input" name="packs_${productIndex}" min="0" value="0" required>
-          </div>
-        </div>
-
-        <div class="mt-2">
-          <label class="form-label">تاريخ الانتهاء:</label>
-          <input type="date" class="form-control expiry-input" name="expiry_${productIndex}" required>
-        </div>
-      </div>
-    </div>
-  `;
-
-  productsBody.appendChild(col);
-
-  // تعبئة قائمة المنتجات
-  const datalist = col.querySelector(`#productsList_${productIndex}`);
-  productsData.forEach(prod => {
-    const opt = document.createElement("option");
-    opt.value = prod.Product_Name_AR;
-    opt.dataset.code = prod.Product_Code;
-    datalist.appendChild(opt);
-  });
-
-  // عناصر البطاقة
-  const nameInput = col.querySelector(".product-input");
-  const codeInput = col.querySelector(".product-code");
-  const unitInput = col.querySelector(".unit-input");
-  const cartonsInput = col.querySelector(".cartons-input");
-  const packsInput = col.querySelector(".packs-input");
-  const expiryInput = col.querySelector(".expiry-input");
-
-  // عند اختيار المنتج
-  nameInput.addEventListener("input", () => {
-    const selected = [...datalist.options].find(opt => opt.value === nameInput.value);
-    if (selected) {
-      codeInput.value = selected.dataset.code;
-      const packs = extractPacksPerCarton(selected.value);
-      unitInput.value = packs ? packs + " باكت/كرتون" : "غير محدد";
+function removeProductRow(btn) {
+    // يجب أن يبقى صف واحد على الأقل لمنع الإرسال الخاطئ
+    const productsBody = document.getElementById('productsBody');
+    if (productsBody.children.length > 1) {
+         btn.closest('.col-12').remove();
     } else {
-      codeInput.value = "";
-      unitInput.value = "";
+        showMsg("يجب أن يبقى منتج واحد على الأقل في القائمة.", true);
     }
-    updateSummary();
-  });
-
-  // حذف البطاقة
-  const removeBtn = col.querySelector("[data-action='remove']");
-  removeBtn.addEventListener("click", () => {
-    col.remove();
-    updateSummary();
-  });
-
-  // تحديث الملخص عند تغيير الكميات والانتهاء
-  cartonsInput.addEventListener("input", updateSummary);
-  packsInput.addEventListener("input", updateSummary);
-  expiryInput.addEventListener("input", updateSummary);
-
-  updateSummary();
 }
 
-// ملخص مباشر للكميات
-function updateSummary() {
-  const cards = document.querySelectorAll(".product-card");
-  let totalCartons = 0;
-  let totalPacks = 0;
+// ===================================================
+// 5. دوال التحقق والإرسال
+// ===================================================
 
-  cards.forEach(card => {
-    const cartons = Number(card.querySelector(".cartons-input").value || 0);
-    const packs = Number(card.querySelector(".packs-input").value || 0);
-    
-    totalCartons += cartons;
-    totalPacks += packs;
-    
-    // تحديث حالة انتهاء المنتج
-    const expiryInput = card.querySelector(".expiry-input");
-    checkExpiryStatus(expiryInput);
-  });
-
-  const liveSummary = document.getElementById("liveSummary");
-  if (cards.length === 0) {
-    liveSummary.classList.add("d-none");
-    liveSummary.textContent = "";
-    return;
-  }
-
-  liveSummary.classList.remove("d-none");
-  liveSummary.innerHTML = `
-    <strong>الملخص:</strong> عدد المنتجات: ${cards.length} — إجمالي الكراتين: ${totalCartons} — إجمالي الباكِت: ${totalPacks}
-  `;
-}
-
-// دالة لتلوين حقول تاريخ الانتهاء بناءً على الحالة
-function checkExpiryStatus(input) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  if (!input.value) {
-    input.classList.remove("is-valid", "is-warning", "is-invalid");
-    return;
-  }
-
-  const expiryDate = new Date(input.value);
-  expiryDate.setHours(0, 0, 0, 0);
-
-  const diffTime = expiryDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  input.classList.remove("is-valid", "is-warning", "is-invalid");
-
-  if (diffDays < 0) {
-    input.classList.add("is-invalid"); // منتهي
-  } else if (diffDays <= 30) {
-    input.classList.add("is-warning"); // قريب الانتهاء
-  } else {
-    input.classList.add("is-valid"); // صالح
-  }
-}
-
-// ===========================================
-// الإرسال والتحقق
-// ===========================================
-
-// دالة عرض رسالة للمستخدم
-function showMsg(message, type) {
-    const formMsg = document.getElementById('formMsg');
-    formMsg.textContent = message;
-    formMsg.className = `msg mb-3 ${type}`; 
-    formMsg.style.display = 'block';
-    setTimeout(() => {
-        formMsg.style.display = 'none';
-    }, 7000); 
-}
-
-// بناء معاينة قبل الإرسال في المودال
-function buildPreview() {
-  const previewContainer = document.getElementById("previewContainer");
-  // ... (نفس منطق buildPreview) ...
-  const headerFields = [
-    { label: "اسم مدخل البيانات", value: document.getElementById("entryName").value },
-    { label: "مندوب المبيعات", value: document.getElementById("salesRep").value },
-    { label: "المحافظة", value: document.getElementById("governorate").value },
-    { label: "اسم العميل", value: document.getElementById("customer").value },
-    { label: "كود العميل", value: document.getElementById("customer_code").value },
-    { label: "تاريخ الزيارة", value: document.getElementById("visit_date").value },
-    { label: "وقت الدخول", value: document.getElementById("visit_time").value },
-    { label: "وقت الخروج", value: document.getElementById("exit_time").value },
-    { label: "ملاحظات", value: document.getElementById("notes").value || "—" }
-  ];
-
-  const products = serializeFormData().products;
-
-  const headerHtml = `
-    <div class="mb-3">
-      <h6 class="text-primary">بيانات الزيارة</h6>
-      <ul class="list-group list-group-flush">
-        ${headerFields.map(f => `<li class="list-group-item d-flex justify-content-between"><strong>${f.label}:</strong> <span>${f.value || "—"}</span></li>`).join("")}
-      </ul>
-    </div>
-  `;
-
-  const productsHtml = `
-    <div>
-      <h6 class="text-primary">جرد المنتجات</h6>
-      ${products.length === 0 ? `<div class="alert alert-warning">لا توجد منتجات مضافة.</div>` : `
-        <div class="table-responsive">
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>#</th><th>اسم المنتج</th><th>الكود</th><th>الوحدة</th><th>كرتون</th><th>باكت</th><th>الانتهاء</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${products.map((p, idx) => `
-                <tr>
-                  <td>${idx + 1}</td>
-                  <td>${p.name}</td>
-                  <td>${p.code}</td>
-                  <td>${p.unit}</td>
-                  <td>${p.cartons}</td>
-                  <td>${p.packs}</td>
-                  <td>${p.expiry}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `}
-    </div>
-  `;
-
-  previewContainer.innerHTML = headerHtml + productsHtml;
-}
-
-// تحقق أساسي قبل الإرسال
 function validateForm() {
-  if (!form.reportValidity()) {
-    showMsg("يرجى ملء جميع الحقول المطلوبة في النموذج.", 'error');
-    return false;
-  }
-
-  const customerCode = document.getElementById("customer_code").value.trim();
-  if (!customerCode) {
-    showMsg("رجاءً اختر العميل من القائمة حتى يظهر كوده.", 'error');
-    return false;
-  }
-
-  const cards = document.querySelectorAll(".product-card");
-  if (cards.length === 0) {
-    showMsg("أضف منتجًا واحدًا على الأقل للجرد.", 'error');
-    return false;
-  }
-
-  return true;
-}
-
-// تجميع البيانات للإرسال
-function serializeFormData() {
-  const payload = {
-    entryName: document.getElementById("entryName").value,
-    salesRep: document.getElementById("salesRep").value,
-    governorate: document.getElementById("governorate").value,
-    customer: document.getElementById("customer").value,
-    customer_code: document.getElementById("customer_code").value,
-    visit_date: document.getElementById("visit_date").value,
-    visit_time: document.getElementById("visit_time").value,
-    exit_time: document.getElementById("exit_time").value,
-    notes: document.getElementById("notes").value || "",
-    products: []
-  };
-
-  const cards = document.querySelectorAll(".product-card");
-  cards.forEach(card => {
-    payload.products.push({
-      name: card.querySelector(".product-input").value,
-      code: card.querySelector(".product-code").value,
-      unit: card.querySelector(".unit-input").value,
-      cartons: Number(card.querySelector(".cartons-input").value || 0),
-      packs: Number(card.querySelector(".packs-input").value || 0),
-      expiry: card.querySelector(".expiry-input").value
-    });
-  });
-
-  return payload;
-}
-
-// إرسال البيانات إلى Google Apps Script
-async function postData(data) {
-  // تعطيل الأزرار أثناء الإرسال
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const confirmBtn = document.getElementById("confirmSendBtn");
-  submitBtn.disabled = true;
-  confirmBtn.disabled = true;
-  
-  // إغلاق المودال مباشرة قبل الإرسال لمنع التكرار
-  const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
-  if (modal) modal.hide(); 
-
-  try {
-    // استخدام mode: 'no-cors' لتجاوز مشكلة CORS
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: 'no-cors', // هذا هو المفتاح لإرسال البيانات دون قيود CORS
-      headers: { 
-        "Content-Type": "application/json" 
-      },
-      body: JSON.stringify(data)
-    });
-
-    // رسالة النجاح المطلوبة منك (مع افتراض النجاح):
-    showMsg("✅ تم الإرسال بنجاح. سنقوم بمراجعة البيانات الآن.", 'success');
+    const form = document.getElementById('inventoryForm');
     
-    // إعادة تهيئة النموذج
-    form.reset();
-    productsBody.innerHTML = "";
-    productIndex = 0;
-    addProductRow();
-    setDefaultDateTime();
-    updateSummary();
+    // 1. إذا كان وقت الخروج فارغاً، يتم تعبئته تلقائياً بالوقت الحالي
+    let exitTime = document.getElementById('exit_time').value;
+    if (!exitTime) {
+        exitTime = formatTime(new Date());
+        document.getElementById('exit_time').value = exitTime;
+    }
 
-  } catch (err) {
-    console.error("خطأ الإرسال:", err);
-    showMsg("⚠️ فشل في إرسال الطلب. تأكد من الاتصال بالإنترنت وصحة رابط Apps Script.", 'error');
-  } finally {
-    submitBtn.disabled = false;
-    confirmBtn.disabled = false;
-  }
+    // 2. التحقق من صلاحية حقول النموذج الرئيسية
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return false;
+    }
+
+    // 3. التحقق من وجود كود العميل
+    if (!document.getElementById('customer_code').value) {
+        showMsg("يرجى اختيار العميل لتعبئة كود العميل تلقائياً!", true);
+        return false;
+    }
+    
+    // 4. التحقق من تسلسل الأوقات
+    const visitTime = document.getElementById('visit_time').value;
+
+    if (exitTime <= visitTime) {
+        showMsg("خطأ في الأوقات: يجب أن يكون وقت الخروج بعد وقت الدخول.", true);
+        return false;
+    }
+
+    // 5. التحقق من تعبئة جميع بيانات المنتجات المطلوبة
+    const productsBody = document.getElementById('productsBody');
+    const productCards = productsBody.children;
+
+    if (productCards.length === 0) {
+        showMsg("يجب إضافة منتج واحد على الأقل!", true);
+        return false;
+    }
+
+    let allProductsValid = true;
+    Array.from(productCards).forEach((card, index) => {
+        const prodName = card.querySelector('.prod-name').value;
+        const carton = parseInt(card.querySelector('.prod-carton').value) || 0;
+        const packet = parseInt(card.querySelector('.prod-packet').value) || 0;
+        
+        if (!prodName) {
+            showMsg(`خطأ في بطاقة المنتج ${index + 1}: يرجى اختيار اسم المنتج.`, true);
+            allProductsValid = false;
+        } else if (carton === 0 && packet === 0) {
+            showMsg(`خطأ في بطاقة المنتج ${index + 1}: يجب إدخال كمية (كرتون أو باكت) أكبر من الصفر.`, true);
+            allProductsValid = false;
+        }
+    });
+
+    return allProductsValid;
 }
 
-// ===========================================
-// ربط الأحداث
-// ===========================================
+// 💡 هذه الدالة تجمع البيانات في مصفوفة صفوف (كل صف هو كائن)
+function collectRows() {
+    const form = document.getElementById('inventoryForm');
+    const fd = new FormData(form);
+    const commonData = {};
+    
+    // جمع البيانات المشتركة من النموذج (governorate, visit_date, etc.)
+    for (let [key, val] of fd.entries()) {
+        commonData[key] = val;
+    }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadData();
+    const resultRows = [];
+    const productsBody = document.getElementById('productsBody');
+    
+    // إنشاء صف منفصل لكل بطاقة منتج
+    productsBody.querySelectorAll('.col-12').forEach(productCard => { 
+        const row = { ...commonData };
+        
+        // 🛑 إضافة اسم العميل (مطلوب لورقة Sheet)
+        row.customer = document.getElementById('customer').value; 
+        
+        // إضافة تفاصيل المنتج الفريدة
+        row.product_name = productCard.querySelector('.prod-name').value;
+        row.product_code = productCard.querySelector('.prod-code').value;
+        row.product_category = productCard.querySelector('.prod-cat').value;
+        row.carton_qty = productCard.querySelector('.prod-carton').value || "0";
+        row.packet_qty = productCard.querySelector('.prod-packet').value || "0";
+        row.expiry_date = productCard.querySelector('.prod-expiry').value;
+        
+        resultRows.push(row);
+    });
+    return resultRows;
+}
 
-  addProductBtn.addEventListener("click", addProductRow);
+// 💡 هذه الدالة ترسل كل صف كطلب POST منفصل
+async function sendRows(rows) {
+    let success = 0, failed = 0;
+    const total = rows.length;
 
-  form.addEventListener("submit", (e) => {
+    for (let row of rows) {
+        try {
+            // تحويل الكائن (الصف) إلى صيغة URLSearchParams (application/x-www-form-urlencoded)
+            const formBody = Object.keys(row).map(key => 
+                encodeURIComponent(key) + "=" + encodeURIComponent(row[key])
+            ).join("&");
+
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formBody,
+            });
+            
+            const txt = await res.text();
+
+            if (res.ok && txt.includes("Success")) {
+                success++;
+            } else {
+                console.error("خطأ في إرسال صف:", row.product_name, "الاستجابة:", txt);
+                failed++;
+            }
+        } catch (err) {
+            console.error("خطأ شبكة/إرسال:", err);
+            failed++;
+        }
+    }
+
+    if (success === total) {
+        showMsg(`✅ تم إرسال جميع المنتجات (${success}) بنجاح!`);
+        document.getElementById('inventoryForm').reset();
+        document.getElementById('productsBody').innerHTML = "";
+        addProductRow(); 
+    } else if (success > 0 && failed > 0) {
+        showMsg(`⚠️ تم إرسال ${success} منتج بنجاح، وحدثت مشكلة في ${failed} منتج. يرجى مراجعة سجل الأخطاء.`, true);
+    } else {
+        showMsg("❌ لم يتم إرسال أي بيانات بنجاح. حاول مجددًا.", true);
+    }
+}
+
+
+document.getElementById('inventoryForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    document.getElementById('formMsg').style.display = 'none'; 
-
     if (!validateForm()) return;
-
-    buildPreview();
-
-    // إعداد وتشغيل المودال
-    const previewModalEl = document.getElementById("previewModal");
-    const modal = new bootstrap.Modal(previewModalEl);
-    modal.show();
-
-    const confirmBtn = document.getElementById("confirmSendBtn");
     
-    // يجب إزالة المستمع القديم قبل إضافة الجديد لتجنب تكرار الإرسال
-    const oldListener = confirmBtn.dataset.listener;
-    if (oldListener) {
-        // نستخدم نسخة مبسطة من إزالة المستمع، فقط لإزالة التكرار المحتمل
-        confirmBtn.removeEventListener('click', window.onConfirmHandler); 
-    }
+    showMsg("⏳ يتم الآن إرسال البيانات، يرجى الانتظار...");
+    
+    const rows = collectRows();
+    await sendRows(rows);
+});
 
-    const onConfirm = async () => {
-      // لا حاجة لإخفاء المودال هنا، لأن دالة postData ستفعل ذلك
-      const data = serializeFormData();
-      await postData(data);
-      // إزالة المستمع بعد الإرسال
-      confirmBtn.removeEventListener('click', onConfirm);
-    };
+// بداية التحميل - يتم استدعاء الدوال عند تحميل الصفحة بالكامل
+window.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // 1. تسجيل التاريخ ووقت الدخول التلقائي (وقت فتح الرابط)
+        const now = new Date();
+        const initialTime = formatTime(now);
+        const initialDate = formatDate(now);
+        
+        document.getElementById('visit_time').value = initialTime;
+        document.getElementById('visit_date').value = initialDate;
 
-    confirmBtn.addEventListener("click", onConfirm);
-    window.onConfirmHandler = onConfirm; // تخزين مرجع الدالة لتجنب التكرار في المرة القادمة
-    confirmBtn.dataset.listener = 'onConfirmHandler';
-  });
-  
-  // تحديث الملخص لكامل حقول الزيارة
-  document.querySelectorAll('#inventoryForm input, #inventoryForm select, #inventoryForm textarea').forEach(element => {
-    if (!element.className.includes('product-')) {
-      element.addEventListener('input', updateSummary);
+        // 2. تحميل البيانات
+        await prepareProducts(); 
+        await fillSelects(); 
+        
+        // 3. إضافة أول بطاقة منتج
+        if (PRODUCTS.length > 0) {
+            addProductRow(); 
+        }
+    } catch (e) {
+        console.error("فشل التحميل الأولي للبيانات:", e);
     }
-  });
 });
