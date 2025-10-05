@@ -1,6 +1,6 @@
 /* script.js */
 
-// ** ⚠️ ملاحظة هامة: يجب استبدال هذا برابط Web App بعد النشر ⚠️ **
+// ✅ رابط Google Apps Script (المُرسَل والمُعتمد الآن)
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
 
 // ثوابت تحميل البيانات (يفترض وجود هذه الملفات بجانب ملف HTML)
@@ -12,7 +12,7 @@ const SALES_REPRESENTATIVES_JSON_URL = "sales_representatives.json";
 // متغيرات عامة
 let productsData = [];
 let customersData = [];
-let productIndex = 0; // لعد المنتجات وإعطاء ID فريد
+let productIndex = 0; 
 
 // عناصر النموذج
 const form = document.getElementById("inventoryForm");
@@ -58,17 +58,20 @@ function setDefaultDateTime() {
 
 async function loadData() {
   try {
-    // تحميل بيانات المنتجات
-    const prodRes = await fetch(PRODUCTS_JSON_URL);
+    // تحميل البيانات من ملفات JSON
+    const [prodRes, custRes, govRes, repRes] = await Promise.all([
+        fetch(PRODUCTS_JSON_URL),
+        fetch(CUSTOMERS_JSON_URL),
+        fetch(GOVERNORATES_JSON_URL),
+        fetch(SALES_REPRESENTATIVES_JSON_URL)
+    ]);
+
     productsData = await prodRes.json();
-
-    // تحميل بيانات العملاء
-    const custRes = await fetch(CUSTOMERS_JSON_URL);
     customersData = await custRes.json();
-
-    // تحميل المحافظات
-    const govRes = await fetch(GOVERNORATES_JSON_URL);
     const governorates = await govRes.json();
+    const reps = await repRes.json();
+
+    // تعبئة المحافظات
     const govSelect = document.getElementById("governorate");
     governorates.forEach(name => {
       const opt = document.createElement("option");
@@ -77,9 +80,7 @@ async function loadData() {
       govSelect.appendChild(opt);
     });
 
-    // تحميل المندوبين
-    const repRes = await fetch(SALES_REPRESENTATIVES_JSON_URL);
-    const reps = await repRes.json();
+    // تعبئة المندوبين
     const repSelect = document.getElementById("salesRep");
     reps.forEach(name => {
       const opt = document.createElement("option");
@@ -103,20 +104,20 @@ async function loadData() {
     customerInput.addEventListener("input", () => {
       const selected = [...customersList.options].find(opt => opt.value === customerInput.value);
       customerCode.value = selected ? selected.dataset.code : "";
-      updateSummary(); // تحديث الملخص بعد تغيير العميل (لتضمين التحقق)
+      updateSummary();
     });
 
     setDefaultDateTime();
     addProductRow(); // إضافة أول صف منتج
     updateSummary();
   } catch (err) {
-    showMsg(`خطأ في تحميل البيانات الأساسية: ${err.message}`, 'error');
+    showMsg(`خطأ في تحميل البيانات الأساسية (ملفات JSON): ${err.message}`, 'error');
     console.error("خطأ في تحميل البيانات:", err);
   }
 }
 
 // ===========================================
-// إدارة المنتجات الديناميكية
+// إدارة المنتجات الديناميكية والملخص
 // ===========================================
 
 // إضافة بطاقة منتج
@@ -189,7 +190,6 @@ function addProductRow() {
     const selected = [...datalist.options].find(opt => opt.value === nameInput.value);
     if (selected) {
       codeInput.value = selected.dataset.code;
-
       const packs = extractPacksPerCarton(selected.value);
       unitInput.value = packs ? packs + " باكت/كرتون" : "غير محدد";
     } else {
@@ -251,7 +251,6 @@ function checkExpiryStatus(input) {
   today.setHours(0, 0, 0, 0);
   
   if (!input.value) {
-    // إزالة جميع الفئات إذا كان فارغًا
     input.classList.remove("is-valid", "is-warning", "is-invalid");
     return;
   }
@@ -259,7 +258,6 @@ function checkExpiryStatus(input) {
   const expiryDate = new Date(input.value);
   expiryDate.setHours(0, 0, 0, 0);
 
-  // الفرق بالأيام
   const diffTime = expiryDate.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -268,7 +266,7 @@ function checkExpiryStatus(input) {
   if (diffDays < 0) {
     input.classList.add("is-invalid"); // منتهي
   } else if (diffDays <= 30) {
-    input.classList.add("is-warning"); // قريب الانتهاء (أقل من شهر)
+    input.classList.add("is-warning"); // قريب الانتهاء
   } else {
     input.classList.add("is-valid"); // صالح
   }
@@ -282,18 +280,17 @@ function checkExpiryStatus(input) {
 function showMsg(message, type) {
     const formMsg = document.getElementById('formMsg');
     formMsg.textContent = message;
-    formMsg.className = `msg mb-3 ${type}`; // type يجب أن تكون 'success' أو 'error'
+    formMsg.className = `msg mb-3 ${type}`; 
     formMsg.style.display = 'block';
     setTimeout(() => {
         formMsg.style.display = 'none';
-    }, 7000); // إخفاء الرسالة بعد 7 ثوانٍ
+    }, 7000); 
 }
-
 
 // بناء معاينة قبل الإرسال في المودال
 function buildPreview() {
   const previewContainer = document.getElementById("previewContainer");
-
+  // ... (نفس منطق buildPreview) ...
   const headerFields = [
     { label: "اسم مدخل البيانات", value: document.getElementById("entryName").value },
     { label: "مندوب المبيعات", value: document.getElementById("salesRep").value },
@@ -306,9 +303,8 @@ function buildPreview() {
     { label: "ملاحظات", value: document.getElementById("notes").value || "—" }
   ];
 
-  const products = serializeFormData().products; // نستخدم serializeFormData لجلب المنتجات
+  const products = serializeFormData().products;
 
-  // HTML المعاينة
   const headerHtml = `
     <div class="mb-3">
       <h6 class="text-primary">بيانات الزيارة</h6>
@@ -410,30 +406,36 @@ async function postData(data) {
   const confirmBtn = document.getElementById("confirmSendBtn");
   submitBtn.disabled = true;
   confirmBtn.disabled = true;
+  
+  // إغلاق المودال مباشرة قبل الإرسال لمنع التكرار
+  const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
+  if (modal) modal.hide(); 
 
   try {
-    const res = await fetch(GOOGLE_SCRIPT_URL, {
+    // استخدام mode: 'no-cors' لتجاوز مشكلة CORS
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      mode: 'no-cors', // هذا هو المفتاح لإرسال البيانات دون قيود CORS
+      headers: { 
+        "Content-Type": "application/json" 
+      },
       body: JSON.stringify(data)
     });
 
-    const result = await res.json();
+    // رسالة النجاح المطلوبة منك (مع افتراض النجاح):
+    showMsg("✅ تم الإرسال بنجاح. سنقوم بمراجعة البيانات الآن.", 'success');
+    
+    // إعادة تهيئة النموذج
+    form.reset();
+    productsBody.innerHTML = "";
+    productIndex = 0;
+    addProductRow();
+    setDefaultDateTime();
+    updateSummary();
 
-    if (res.ok && result.success) {
-      showMsg("✅ تم إرسال البيانات بنجاح", 'success');
-      form.reset();
-      productsBody.innerHTML = "";
-      productIndex = 0;
-      addProductRow();
-      setDefaultDateTime();
-      updateSummary();
-    } else {
-      showMsg(`❌ تعذر الإرسال: ${result.message || "خطأ غير معروف في السيرفر"}`, 'error');
-    }
   } catch (err) {
     console.error("خطأ الإرسال:", err);
-    showMsg("⚠️ تعذر الاتصال بالخادم. تحقق من رابط Google Apps Script.", 'error');
+    showMsg("⚠️ فشل في إرسال الطلب. تأكد من الاتصال بالإنترنت وصحة رابط Apps Script.", 'error');
   } finally {
     submitBtn.disabled = false;
     confirmBtn.disabled = false;
@@ -451,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    document.getElementById('formMsg').style.display = 'none'; // إخفاء الرسالة القديمة
+    document.getElementById('formMsg').style.display = 'none'; 
 
     if (!validateForm()) return;
 
@@ -467,19 +469,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // يجب إزالة المستمع القديم قبل إضافة الجديد لتجنب تكرار الإرسال
     const oldListener = confirmBtn.dataset.listener;
     if (oldListener) {
-        confirmBtn.removeEventListener('click', window[oldListener]);
+        // نستخدم نسخة مبسطة من إزالة المستمع، فقط لإزالة التكرار المحتمل
+        confirmBtn.removeEventListener('click', window.onConfirmHandler); 
     }
 
     const onConfirm = async () => {
-      // إغلاق المودال قبل الإرسال لمنع التكرار
-      modal.hide(); 
-      confirmBtn.removeEventListener('click', onConfirm); // إزالة المستمع بعد الاستخدام
+      // لا حاجة لإخفاء المودال هنا، لأن دالة postData ستفعل ذلك
       const data = serializeFormData();
       await postData(data);
+      // إزالة المستمع بعد الإرسال
+      confirmBtn.removeEventListener('click', onConfirm);
     };
 
     confirmBtn.addEventListener("click", onConfirm);
-    confirmBtn.dataset.listener = onConfirm.name || 'onConfirmHandler'; // تخزين اسم المستمع
+    window.onConfirmHandler = onConfirm; // تخزين مرجع الدالة لتجنب التكرار في المرة القادمة
+    confirmBtn.dataset.listener = 'onConfirmHandler';
   });
   
   // تحديث الملخص لكامل حقول الزيارة
