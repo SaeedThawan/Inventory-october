@@ -1,66 +1,67 @@
 /* style.css */
 
 body {
-    font-family: 'Arial', sans-serif; 
+  font-family: 'Arial', sans-serif;
 }
 
 /* تحسين شكل الرسائل */
 .msg {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .msg.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .msg.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 /* تخصيص البطاقة الرئيسية */
 .card {
-    border-radius: 15px;
+  border-radius: 15px;
 }
 
-/* ---------------------------------- */
-/* أنماط بطاقات المنتجات الجديدة (الجرد) */
-/* ---------------------------------- */
-
+/* بطاقات المنتجات */
 .product-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 12px; 
-    border-left: 5px solid var(--bs-primary); /* شريط جانبي أنيق */
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+  border-left: 5px solid var(--bs-primary);
 }
 
-/* تأثير عند المرور أو التركيز (للفخامة) */
 .product-card:hover {
-    transform: translateY(-3px); /* ارتفاع بسيط */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important; 
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* تصميم الزر لإضافة المنتج */
 .add-product-btn {
-    border-radius: 20px; 
-    font-weight: bold;
+  border-radius: 20px;
+  font-weight: bold;
 }
 
-/* تنسيق حقول الإدخال في البطاقات */
-.product-card .form-control, .product-card .form-select {
-    font-size: 0.95rem;
+.product-card .form-control,
+.product-card .form-select {
+  font-size: 0.95rem;
 }
 
 /* حقول القراءة فقط */
 .product-card input[readonly] {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    font-weight: bold;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+/* ملخص مباشر */
+#liveSummary {
+  border-radius: 8px;
+  font-weight: 600;
 }
