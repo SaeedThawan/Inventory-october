@@ -65,3 +65,14 @@ body {
   border-radius: 8px;
   font-weight: 600;
 }
+
+/* تمييز المنتجات حسب تاريخ الانتهاء */
+.product-card.expired {
+  border-left-color: #dc3545 !important; /* أحمر */
+  background-color: #f8d7da !important;
+}
+
+.product-card.near-expiry {
+  border-left-color: #ffc107 !important; /* أصفر */
+  background-color: #fff3cd !important;
+}
