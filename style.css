@@ -1,78 +1,75 @@
-/* style.css */
-
+/* 🌙 خلفية عامة */
 body {
-  font-family: 'Arial', sans-serif;
-}
-
-/* تحسين شكل الرسائل */
-.msg {
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.msg.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.msg.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* تخصيص البطاقة الرئيسية */
-.card {
-  border-radius: 15px;
-}
-
-/* بطاقات المنتجات */
-.product-card {
-  transition: transform 0.2s, box-shadow 0.2s;
-  border-radius: 12px;
-  border-left: 5px solid var(--bs-primary);
-}
-
-.product-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
-}
-
-.add-product-btn {
-  border-radius: 20px;
-  font-weight: bold;
-}
-
-.product-card .form-control,
-.product-card .form-select {
-  font-size: 0.95rem;
-}
-
-/* حقول القراءة فقط */
-.product-card input[readonly] {
   background-color: #f8f9fa;
-  color: #6c757d;
+  font-family: "Tahoma", "Arial", sans-serif;
+}
+
+/* 🟦 رأس الكارد */
+.card-header {
   font-weight: bold;
+  font-size: 1.2rem;
 }
 
-/* ملخص مباشر */
-#liveSummary {
-  border-radius: 8px;
-  font-weight: 600;
+/* 🟩 بطاقات المنتجات */
+.product-card .card {
+  border-right: 5px solid #0d6efd; /* خط جانبي أزرق */
+  transition: transform 0.2s ease-in-out;
+}
+.product-card .card:hover {
+  transform: scale(1.02);
 }
 
-/* تمييز المنتجات حسب تاريخ الانتهاء */
-.product-card.expired {
-  border-left-color: #dc3545 !important; /* أحمر */
+/* 🟨 خانة التحذير (قريب الانتهاء) */
+.is-warning {
+  border-color: orange !important;
+  background-color: #fff8e1 !important;
+}
+
+/* 🟢 خانة صالحة */
+.is-valid {
+  border-color: #198754 !important;
+  background-color: #e9f7ef !important;
+}
+
+/* 🔴 خانة منتهية */
+.is-invalid {
+  border-color: #dc3545 !important;
   background-color: #f8d7da !important;
 }
 
-.product-card.near-expiry {
-  border-left-color: #ffc107 !important; /* أصفر */
-  background-color: #fff3cd !important;
+/* 💬 رسائل التنبيه */
+.msg {
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+.msg.success {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+.msg.error {
+  background: #f8d7da;
+  color: #842029;
+}
+.msg.info {
+  background: #cff4fc;
+  color: #055160;
+}
+
+/* 📊 الملخص المباشر */
+#liveSummary {
+  font-weight: bold;
+  font-size: 0.95rem;
+  border-left: 5px solid #6c757d;
+}
+
+/* 📝 textarea */
+textarea.form-control {
+  resize: vertical;
+}
+
+/* 🔘 زر إضافة منتج */
+.add-product-btn {
+  font-size: 0.85rem;
+  padding: 4px 10px;
 }
