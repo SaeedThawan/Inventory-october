@@ -1,14 +1,28 @@
 /* script.js */
 
-// ✅ تم تعديل الرابط بنجاح
+// ** ⚠️ ملاحظة هامة: يجب استبدال هذا برابط Web App بعد النشر ⚠️ **
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
 
+// ثوابت تحميل البيانات (يفترض وجود هذه الملفات بجانب ملف HTML)
+const PRODUCTS_JSON_URL = "products.json";
+const CUSTOMERS_JSON_URL = "customers_main.json";
+const GOVERNORATES_JSON_URL = "governorates.json";
+const SALES_REPRESENTATIVES_JSON_URL = "sales_representatives.json";
+
+// متغيرات عامة
 let productsData = [];
 let customersData = [];
-let productIndex = 0;
+let productIndex = 0; // لعد المنتجات وإعطاء ID فريد
+
+// عناصر النموذج
 const form = document.getElementById("inventoryForm");
 const addProductBtn = document.getElementById("addProductBtn");
+const productsBody = document.getElementById("productsBody");
 
+
+// ===========================================
+// دوال المساعدة
+// ===========================================
 
 // دالة استخراج عدد البواكت من اسم المنتج
 function extractPacksPerCarton(productName) {
@@ -19,46 +33,62 @@ function extractPacksPerCarton(productName) {
   return null;
 }
 
-// دالة وهمية لتعيين الوقت والتاريخ الافتراضي
+// تعيين التاريخ والوقت الحالي كقيم افتراضية
 function setDefaultDateTime() {
-  const today = new Date();
-  const dateString = today.toISOString().split('T')[0];
-  const timeString = today.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
-  
-  document.getElementById("visit_date").value = dateString;
-  document.getElementById("visit_time").value = timeString;
-  document.getElementById("exit_time").value = timeString;
+  const now = new Date();
+  const dateInput = document.getElementById("visit_date");
+  const timeInput = document.getElementById("visit_time");
+  const exitTimeInput = document.getElementById("exit_time");
+
+  const pad = (num) => num.toString().padStart(2, '0');
+
+  // تهيئة التاريخ (YYYY-MM-DD)
+  const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  dateInput.value = dateStr;
+
+  // تهيئة الوقت (HH:MM)
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  timeInput.value = timeStr;
+  exitTimeInput.value = timeStr;
 }
 
-// تحميل البيانات (يجب توفير ملفات JSON في نفس المجلد)
+// ===========================================
+// تحميل البيانات
+// ===========================================
+
 async function loadData() {
   try {
-    // يجب استبدال استدعاءات الـ fetch هذه باستدعاء API حقيقي
-    // أو توفير ملفات JSON في نفس مكان ملف الـ HTML
-    const prodRes = await fetch("products.json");
+    // تحميل بيانات المنتجات
+    const prodRes = await fetch(PRODUCTS_JSON_URL);
     productsData = await prodRes.json();
 
-    const custRes = await fetch("customers_main.json");
+    // تحميل بيانات العملاء
+    const custRes = await fetch(CUSTOMERS_JSON_URL);
     customersData = await custRes.json();
 
-    const govRes = await fetch("governorates.json");
+    // تحميل المحافظات
+    const govRes = await fetch(GOVERNORATES_JSON_URL);
     const governorates = await govRes.json();
     const govSelect = document.getElementById("governorate");
     governorates.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
+      opt.textContent = name;
       govSelect.appendChild(opt);
     });
 
-    const repRes = await fetch("sales_representatives.json");
+    // تحميل المندوبين
+    const repRes = await fetch(SALES_REPRESENTATIVES_JSON_URL);
     const reps = await repRes.json();
     const repSelect = document.getElementById("salesRep");
     reps.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
+      opt.textContent = name;
       repSelect.appendChild(opt);
     });
 
+    // تعبئة قائمة العملاء (datalist)
     const customersList = document.getElementById("customersList");
     customersData.forEach(c => {
       const opt = document.createElement("option");
@@ -67,25 +97,32 @@ async function loadData() {
       customersList.appendChild(opt);
     });
 
+    // ربط اسم العميل بكوده
     const customerInput = document.getElementById("customer");
     const customerCode = document.getElementById("customer_code");
     customerInput.addEventListener("input", () => {
       const selected = [...customersList.options].find(opt => opt.value === customerInput.value);
       customerCode.value = selected ? selected.dataset.code : "";
+      updateSummary(); // تحديث الملخص بعد تغيير العميل (لتضمين التحقق)
     });
 
     setDefaultDateTime();
-    addProductRow();
+    addProductRow(); // إضافة أول صف منتج
+    updateSummary();
   } catch (err) {
+    showMsg(`خطأ في تحميل البيانات الأساسية: ${err.message}`, 'error');
     console.error("خطأ في تحميل البيانات:", err);
   }
 }
 
+// ===========================================
+// إدارة المنتجات الديناميكية
+// ===========================================
+
 // إضافة بطاقة منتج
 function addProductRow() {
   productIndex++;
-  const productsBody = document.getElementById("productsBody");
-
+  
   const col = document.createElement("div");
   col.className = "col-md-6 product-card";
 
@@ -153,13 +190,8 @@ function addProductRow() {
     if (selected) {
       codeInput.value = selected.dataset.code;
 
-      // استخرج عدد البواكت من اسم المنتج
       const packs = extractPacksPerCarton(selected.value);
-      if (packs) {
-        unitInput.value = packs + " باكت/كرتون";
-      } else {
-        unitInput.value = "غير محدد";
-      }
+      unitInput.value = packs ? packs + " باكت/كرتون" : "غير محدد";
     } else {
       codeInput.value = "";
       unitInput.value = "";
@@ -174,7 +206,7 @@ function addProductRow() {
     updateSummary();
   });
 
-  // تحديث الملخص عند تغيير الكميات
+  // تحديث الملخص عند تغيير الكميات والانتهاء
   cartonsInput.addEventListener("input", updateSummary);
   packsInput.addEventListener("input", updateSummary);
   expiryInput.addEventListener("input", updateSummary);
@@ -191,8 +223,13 @@ function updateSummary() {
   cards.forEach(card => {
     const cartons = Number(card.querySelector(".cartons-input").value || 0);
     const packs = Number(card.querySelector(".packs-input").value || 0);
+    
     totalCartons += cartons;
     totalPacks += packs;
+    
+    // تحديث حالة انتهاء المنتج
+    const expiryInput = card.querySelector(".expiry-input");
+    checkExpiryStatus(expiryInput);
   });
 
   const liveSummary = document.getElementById("liveSummary");
@@ -207,6 +244,51 @@ function updateSummary() {
     <strong>الملخص:</strong> عدد المنتجات: ${cards.length} — إجمالي الكراتين: ${totalCartons} — إجمالي الباكِت: ${totalPacks}
   `;
 }
+
+// دالة لتلوين حقول تاريخ الانتهاء بناءً على الحالة
+function checkExpiryStatus(input) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  if (!input.value) {
+    // إزالة جميع الفئات إذا كان فارغًا
+    input.classList.remove("is-valid", "is-warning", "is-invalid");
+    return;
+  }
+
+  const expiryDate = new Date(input.value);
+  expiryDate.setHours(0, 0, 0, 0);
+
+  // الفرق بالأيام
+  const diffTime = expiryDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  input.classList.remove("is-valid", "is-warning", "is-invalid");
+
+  if (diffDays < 0) {
+    input.classList.add("is-invalid"); // منتهي
+  } else if (diffDays <= 30) {
+    input.classList.add("is-warning"); // قريب الانتهاء (أقل من شهر)
+  } else {
+    input.classList.add("is-valid"); // صالح
+  }
+}
+
+// ===========================================
+// الإرسال والتحقق
+// ===========================================
+
+// دالة عرض رسالة للمستخدم
+function showMsg(message, type) {
+    const formMsg = document.getElementById('formMsg');
+    formMsg.textContent = message;
+    formMsg.className = `msg mb-3 ${type}`; // type يجب أن تكون 'success' أو 'error'
+    formMsg.style.display = 'block';
+    setTimeout(() => {
+        formMsg.style.display = 'none';
+    }, 7000); // إخفاء الرسالة بعد 7 ثوانٍ
+}
+
 
 // بناء معاينة قبل الإرسال في المودال
 function buildPreview() {
@@ -224,19 +306,7 @@ function buildPreview() {
     { label: "ملاحظات", value: document.getElementById("notes").value || "—" }
   ];
 
-  const cards = document.querySelectorAll(".product-card");
-  const products = [];
-  cards.forEach((card, idx) => {
-    products.push({
-      index: idx + 1,
-      name: card.querySelector(".product-input").value,
-      code: card.querySelector(".product-code").value,
-      unit: card.querySelector(".unit-input").value,
-      cartons: card.querySelector(".cartons-input").value,
-      packs: card.querySelector(".packs-input").value,
-      expiry: card.querySelector(".expiry-input").value
-    });
-  });
+  const products = serializeFormData().products; // نستخدم serializeFormData لجلب المنتجات
 
   // HTML المعاينة
   const headerHtml = `
@@ -260,9 +330,9 @@ function buildPreview() {
               </tr>
             </thead>
             <tbody>
-              ${products.map(p => `
+              ${products.map((p, idx) => `
                 <tr>
-                  <td>${p.index}</td>
+                  <td>${idx + 1}</td>
                   <td>${p.name}</td>
                   <td>${p.code}</td>
                   <td>${p.unit}</td>
@@ -283,17 +353,20 @@ function buildPreview() {
 
 // تحقق أساسي قبل الإرسال
 function validateForm() {
-  if (!form.reportValidity()) return false;
+  if (!form.reportValidity()) {
+    showMsg("يرجى ملء جميع الحقول المطلوبة في النموذج.", 'error');
+    return false;
+  }
 
   const customerCode = document.getElementById("customer_code").value.trim();
   if (!customerCode) {
-    alert("رجاءً اختر العميل من القائمة حتى يظهر كوده.");
+    showMsg("رجاءً اختر العميل من القائمة حتى يظهر كوده.", 'error');
     return false;
   }
 
   const cards = document.querySelectorAll(".product-card");
   if (cards.length === 0) {
-    alert("أضف منتجًا واحدًا على الأقل للجرد.");
+    showMsg("أضف منتجًا واحدًا على الأقل للجرد.", 'error');
     return false;
   }
 
@@ -332,6 +405,12 @@ function serializeFormData() {
 
 // إرسال البيانات إلى Google Apps Script
 async function postData(data) {
+  // تعطيل الأزرار أثناء الإرسال
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const confirmBtn = document.getElementById("confirmSendBtn");
+  submitBtn.disabled = true;
+  confirmBtn.disabled = true;
+
   try {
     const res = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
@@ -339,28 +418,32 @@ async function postData(data) {
       body: JSON.stringify(data)
     });
 
-    // يجب أن يعيد Google Apps Script استجابة JSON للنجاح/الفشل
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const result = await res.json();
 
-    if (result.success) {
-      alert("✅ تم إرسال البيانات بنجاح");
+    if (res.ok && result.success) {
+      showMsg("✅ تم إرسال البيانات بنجاح", 'success');
       form.reset();
-      document.getElementById("productsBody").innerHTML = "";
+      productsBody.innerHTML = "";
       productIndex = 0;
       addProductRow();
       setDefaultDateTime();
       updateSummary();
     } else {
-      alert("❌ تعذر الإرسال: " + (result.message || ""));
+      showMsg(`❌ تعذر الإرسال: ${result.message || "خطأ غير معروف في السيرفر"}`, 'error');
     }
   } catch (err) {
     console.error("خطأ الإرسال:", err);
-    alert("⚠️ تعذر الاتصال بالخادم. تحقق من رابط Google Apps Script و من إعدادات CORS.");
+    showMsg("⚠️ تعذر الاتصال بالخادم. تحقق من رابط Google Apps Script.", 'error');
+  } finally {
+    submitBtn.disabled = false;
+    confirmBtn.disabled = false;
   }
 }
 
+// ===========================================
 // ربط الأحداث
+// ===========================================
+
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
 
@@ -368,27 +451,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    document.getElementById('formMsg').style.display = 'none'; // إخفاء الرسالة القديمة
+
     if (!validateForm()) return;
 
     buildPreview();
 
+    // إعداد وتشغيل المودال
     const previewModalEl = document.getElementById("previewModal");
     const modal = new bootstrap.Modal(previewModalEl);
     modal.show();
 
     const confirmBtn = document.getElementById("confirmSendBtn");
-    // يجب استخدام دالة واحدة فقط لمعالجة النقر، لتجنب الإرسال المتعدد
+    
+    // يجب إزالة المستمع القديم قبل إضافة الجديد لتجنب تكرار الإرسال
+    const oldListener = confirmBtn.dataset.listener;
+    if (oldListener) {
+        confirmBtn.removeEventListener('click', window[oldListener]);
+    }
+
     const onConfirm = async () => {
-      // إزالة المعالج قبل الإرسال لمنع النقر المزدوج
-      confirmBtn.removeEventListener("click", onConfirm); 
-      
-      modal.hide();
+      // إغلاق المودال قبل الإرسال لمنع التكرار
+      modal.hide(); 
+      confirmBtn.removeEventListener('click', onConfirm); // إزالة المستمع بعد الاستخدام
       const data = serializeFormData();
       await postData(data);
-
-      // إعادة إضافة المعالج استعداداً للنموذج التالي (أو إعادة تحميل الصفحة)
-      // في هذه الحالة نعتمد على إعادة التحميل بعد الـ form.reset()
     };
+
     confirmBtn.addEventListener("click", onConfirm);
+    confirmBtn.dataset.listener = onConfirm.name || 'onConfirmHandler'; // تخزين اسم المستمع
+  });
+  
+  // تحديث الملخص لكامل حقول الزيارة
+  document.querySelectorAll('#inventoryForm input, #inventoryForm select, #inventoryForm textarea').forEach(element => {
+    if (!element.className.includes('product-')) {
+      element.addEventListener('input', updateSummary);
+    }
   });
 });
