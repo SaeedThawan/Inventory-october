@@ -1,110 +1,129 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نموذج جرد</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نموذج جرد</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-light">
-    <div class="container py-4">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-primary text-white text-center">
-                <h3 class="mb-0">نموذج جرد</h3>
-            </div>
-            <div class="card-body p-4">
-                
-                <div id="formMsg" class="msg mb-3" style="display: none;"></div>
-                
-                <form id="inventoryForm">
-                    
-                    <div class="row g-3 mb-4 border-bottom pb-3">
-                        <h5 class="text-primary border-bottom pb-2">بيانات الزيارة</h5>
-                        
-                        <div class="col-md-6">
-                            <label for="entryName" class="form-label">اسم مدخل البيانات:</label>
-                            <input type="text" class="form-control" id="entryName" name="entryName" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="salesRep" class="form-label">مندوب المبيعات:</label>
-                            <select class="form-select" id="salesRep" name="salesRep" required>
-                                <option value="">اختر المندوب...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="governorate" class="form-label">المحافظة:</label>
-                            <select class="form-select" id="governorate" name="governorate" required>
-                                <option value="">اختر المحافظة...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="customer" class="form-label">اسم العميل:</label>
-                            <input type="text" class="form-control" id="customer" name="customer" list="customersList" placeholder="اكتب اسم العميل..." required>
-                            <datalist id="customersList"></datalist>
-                        </div>
-                        
-                        <input type="hidden" id="customer_code" name="customer_code">
-                        
-                        <div class="col-md-4">
-                            <label for="visit_date" class="form-label">تاريخ الزيارة:</label>
-                            <input type="date" class="form-control" id="visit_date" name="visit_date" required>
-                        </div>
-                        
-                        <div class="col-md-2">
-                            <label for="visit_time" class="form-label">وقت الدخول:</label>
-                            <input type="time" class="form-control" id="visit_time" name="visit_time" required>
-                        </div>
-                        
-                        <div class="col-md-2">
-                            <label for="exit_time" class="form-label">وقت الخروج:</label>
-                            <input type="time" class="form-control" id="exit_time" name="exit_time" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h5 class="text-primary border-bottom pb-2 d-flex justify-content-between align-items-center">
-                            جرد المنتجات
-                            <button type="button" class="btn btn-success btn-sm add-product-btn" onclick="addProductRow()">
-                                إضافة منتج جديد
-                            </button>
-                        </h5>
-                        
-                        <div id="productsBody" class="row g-3"> 
-                            </div>
-                        
-                        <div class="alert alert-info mt-3 p-2 small" role="alert">
-                            <strong>إرشادات الجرد:</strong>
-                            <ul class="mb-0">
-                                <li><strong>تاريخ الانتهاء:</strong> يجب تعبئته لكل منتج (إلزامي).</li>
-                                <li><strong>الكميات:</strong> أدخل 0 إذا لم يتوفر كرتون أو باكت.</li>
-                                <li><strong>الحذف:</strong> استخدم زر 'حذف' في البطاقة لإزالة المنتج.</li>
-                            </ul>
-                        </div>
-                    </div>
+  <div class="container py-4">
+    <div class="card shadow-lg border-0">
+      <div class="card-header bg-primary text-white text-center">
+        <h3 class="mb-0">نموذج جرد</h3>
+      </div>
 
-                    <div class="mb-4">
-                        <h5 class="text-primary border-bottom pb-2">ملاحظات واقتراحات</h5>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="اكتب أي ملاحظات أو اقتراحات هنا (اختياري)..."></textarea>
-                    </div>
+      <div class="card-body p-4">
+        <div id="formMsg" class="msg mb-3" style="display: none;"></div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            إرسال بيانات الجرد
-                        </button>
-                    </div>
-                </form>
+        <form id="inventoryForm">
+          <!-- بيانات الزيارة -->
+          <div class="row g-3 mb-4 border-bottom pb-3">
+            <h5 class="text-primary border-bottom pb-2">بيانات الزيارة</h5>
+
+            <div class="col-md-6">
+              <label for="entryName" class="form-label">اسم مدخل البيانات:</label>
+              <input type="text" class="form-control" id="entryName" name="entryName" required>
             </div>
-        </div>
+
+            <div class="col-md-6">
+              <label for="salesRep" class="form-label">مندوب المبيعات:</label>
+              <select class="form-select" id="salesRep" name="salesRep" required>
+                <option value="">اختر المندوب...</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="governorate" class="form-label">المحافظة:</label>
+              <select class="form-select" id="governorate" name="governorate" required>
+                <option value="">اختر المحافظة...</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="customer" class="form-label">اسم العميل:</label>
+              <input type="text" class="form-control" id="customer" name="customer" list="customersList" placeholder="ابحث عن العميل..." required>
+              <datalist id="customersList"></datalist>
+            </div>
+
+            <input type="hidden" id="customer_code" name="customer_code">
+
+            <div class="col-md-4">
+              <label for="visit_date" class="form-label">تاريخ الزيارة:</label>
+              <input type="date" class="form-control" id="visit_date" name="visit_date" required>
+            </div>
+
+            <div class="col-md-2">
+              <label for="visit_time" class="form-label">وقت الدخول:</label>
+              <input type="time" class="form-control" id="visit_time" name="visit_time" required>
+            </div>
+
+            <div class="col-md-2">
+              <label for="exit_time" class="form-label">وقت الخروج:</label>
+              <input type="time" class="form-control" id="exit_time" name="exit_time" required>
+            </div>
+          </div>
+
+          <!-- قسم الجرد -->
+          <div class="mb-4">
+            <h5 class="text-primary border-bottom pb-2 d-flex justify-content-between align-items-center">
+              جرد المنتجات
+              <button type="button" class="btn btn-success btn-sm add-product-btn" id="addProductBtn">
+                إضافة منتج جديد
+              </button>
+            </h5>
+
+            <div id="productsBody" class="row g-3"></div>
+
+            <div class="alert alert-info mt-3 p-2 small" role="alert">
+              <strong>إرشادات الجرد:</strong>
+              <ul class="mb-0">
+                <li><strong>تاريخ الانتهاء:</strong> إلزامي لكل منتج.</li>
+                <li><strong>الكميات:</strong> أدخل 0 إذا لم يتوفر كرتون أو باكت.</li>
+                <li><strong>الحذف:</strong> زر 🗑️ في البطاقة لإزالة المنتج.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ملخص مباشر -->
+          <div id="liveSummary" class="alert alert-secondary d-none"></div>
+
+          <!-- ملاحظات -->
+          <div class="mb-4">
+            <h5 class="text-primary border-bottom pb-2">ملاحظات واقتراحات</h5>
+            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="اختياري..."></textarea>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">إرسال بيانات الجرد</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <script src="script.js"></script>
+  <!-- نافذة مراجعة قبل الإرسال -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="previewLabel">مراجعة البيانات قبل الإرسال</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body">
+          <div id="previewContainer"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">رجوع للتعديل</button>
+          <button type="button" class="btn btn-primary" id="confirmSendBtn">تأكيد الإرسال</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
