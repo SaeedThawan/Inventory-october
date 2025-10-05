@@ -19,7 +19,6 @@
         <div id="formMsg" class="msg mb-3" style="display: none;"></div>
 
         <form id="inventoryForm">
-          <!-- بيانات الزيارة -->
           <div class="row g-3 mb-4 border-bottom pb-3">
             <h5 class="text-primary border-bottom pb-2">بيانات الزيارة</h5>
 
@@ -66,7 +65,6 @@
             </div>
           </div>
 
-          <!-- قسم الجرد -->
           <div class="mb-4">
             <h5 class="text-primary border-bottom pb-2 d-flex justify-content-between align-items-center">
               جرد المنتجات
@@ -76,21 +74,10 @@
             </h5>
 
             <div id="productsBody" class="row g-3"></div>
-
-            <div class="alert alert-info mt-3 p-2 small" role="alert">
-              <strong>إرشادات الجرد:</strong>
-              <ul class="mb-0">
-                <li><strong>تاريخ الانتهاء:</strong> إلزامي لكل منتج.</li>
-                <li><strong>الكميات:</strong> أدخل 0 إذا لم يتوفر كرتون أو باكت.</li>
-                <li><strong>الحذف:</strong> زر 🗑️ في البطاقة لإزالة المنتج.</li>
-              </ul>
-            </div>
           </div>
 
-          <!-- ملخص مباشر -->
           <div id="liveSummary" class="alert alert-secondary d-none"></div>
 
-          <!-- ملاحظات -->
           <div class="mb-4">
             <h5 class="text-primary border-bottom pb-2">ملاحظات واقتراحات</h5>
             <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="اختياري..."></textarea>
@@ -104,7 +91,6 @@
     </div>
   </div>
 
-  <!-- نافذة مراجعة قبل الإرسال -->
   <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -123,7 +109,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr-net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
