@@ -1,78 +1,64 @@
 /* script.js */
 
-// إعدادات عامة
+// ✅ تم تعديل الرابط بنجاح
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
 
 let productsData = [];
 let customersData = [];
 let productIndex = 0;
-
-// عناصر DOM عامة
 const form = document.getElementById("inventoryForm");
-const formMsg = document.getElementById("formMsg");
-const liveSummary = document.getElementById("liveSummary");
 const addProductBtn = document.getElementById("addProductBtn");
 
-// رسائل للمستخدم
-function showMsg(type, text) {
-  // type: success | error | info
-  formMsg.className = `msg alert alert-${type === "success" ? "success" : type === "error" ? "danger" : "info"}`;
-  formMsg.textContent = text;
-  formMsg.style.display = "block";
-  setTimeout(() => {
-    formMsg.style.display = "none";
-  }, 4000);
+
+// دالة استخراج عدد البواكت من اسم المنتج
+function extractPacksPerCarton(productName) {
+  const match = productName.match(/(\d+)\s*×/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  return null;
 }
 
-// تعيين تاريخ ووقت افتراضي
+// دالة وهمية لتعيين الوقت والتاريخ الافتراضي
 function setDefaultDateTime() {
-  const visitDate = document.getElementById("visit_date");
-  const visitTime = document.getElementById("visit_time");
-  const exitTime = document.getElementById("exit_time");
-
-  const now = new Date();
-  const pad = n => String(n).padStart(2, "0");
-
-  visitDate.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  visitTime.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  const exit = new Date(now.getTime() + 30 * 60000);
-  exitTime.value = `${pad(exit.getHours())}:${pad(exit.getMinutes())}`;
+  const today = new Date();
+  const dateString = today.toISOString().split('T')[0];
+  const timeString = today.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
+  
+  document.getElementById("visit_date").value = dateString;
+  document.getElementById("visit_time").value = timeString;
+  document.getElementById("exit_time").value = timeString;
 }
 
-// تحميل البيانات من JSON وتعبئة القوائم
+// تحميل البيانات (يجب توفير ملفات JSON في نفس المجلد)
 async function loadData() {
   try {
-    // المنتجات
+    // يجب استبدال استدعاءات الـ fetch هذه باستدعاء API حقيقي
+    // أو توفير ملفات JSON في نفس مكان ملف الـ HTML
     const prodRes = await fetch("products.json");
     productsData = await prodRes.json();
 
-    // العملاء
     const custRes = await fetch("customers_main.json");
     customersData = await custRes.json();
 
-    // المحافظات
     const govRes = await fetch("governorates.json");
     const governorates = await govRes.json();
     const govSelect = document.getElementById("governorate");
     governorates.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
-      opt.textContent = name;
       govSelect.appendChild(opt);
     });
 
-    // مندوبي المبيعات
     const repRes = await fetch("sales_representatives.json");
     const reps = await repRes.json();
     const repSelect = document.getElementById("salesRep");
     reps.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
-      opt.textContent = name;
       repSelect.appendChild(opt);
     });
 
-    // تعبئة العملاء في datalist
     const customersList = document.getElementById("customersList");
     customersData.forEach(c => {
       const opt = document.createElement("option");
@@ -81,7 +67,6 @@ async function loadData() {
       customersList.appendChild(opt);
     });
 
-    // ربط كود العميل تلقائيًا
     const customerInput = document.getElementById("customer");
     const customerCode = document.getElementById("customer_code");
     customerInput.addEventListener("input", () => {
@@ -90,15 +75,13 @@ async function loadData() {
     });
 
     setDefaultDateTime();
-    addProductRow(); // بطاقة أولى تلقائيًا
-    showMsg("info", "تم تحميل البيانات بنجاح.");
+    addProductRow();
   } catch (err) {
     console.error("خطأ في تحميل البيانات:", err);
-    showMsg("error", "تعذر تحميل البيانات. تأكد من وجود ملفات JSON بجانب الملفات.");
   }
 }
 
-// إضافة بطاقة منتج جديدة
+// إضافة بطاقة منتج
 function addProductRow() {
   productIndex++;
   const productsBody = document.getElementById("productsBody");
@@ -122,8 +105,8 @@ function addProductRow() {
         </div>
 
         <div class="mt-2">
-          <label class="form-label">عدد العبوة:</label>
-          <input type="text" class="form-control unit-input" name="unit_${productIndex}" placeholder="مثال: 12 باكت أو 24 باكت" required>
+          <label class="form-label">عدد العبوة (باكت/كرتون):</label>
+          <input type="text" class="form-control unit-input" name="unit_${productIndex}" readonly>
         </div>
 
         <div class="row g-2 mt-2">
@@ -141,8 +124,6 @@ function addProductRow() {
           <label class="form-label">تاريخ الانتهاء:</label>
           <input type="date" class="form-control expiry-input" name="expiry_${productIndex}" required>
         </div>
-
-        <div class="mt-2 small text-muted duplicate-hint d-none"></div>
       </div>
     </div>
   `;
@@ -161,23 +142,29 @@ function addProductRow() {
   // عناصر البطاقة
   const nameInput = col.querySelector(".product-input");
   const codeInput = col.querySelector(".product-code");
-  const expiryInput = col.querySelector(".expiry-input");
-  const duplicateHint = col.querySelector(".duplicate-hint");
+  const unitInput = col.querySelector(".unit-input");
   const cartonsInput = col.querySelector(".cartons-input");
   const packsInput = col.querySelector(".packs-input");
+  const expiryInput = col.querySelector(".expiry-input");
 
-  // ربط كود المنتج عند اختيار الاسم
+  // عند اختيار المنتج
   nameInput.addEventListener("input", () => {
     const selected = [...datalist.options].find(opt => opt.value === nameInput.value);
-    codeInput.value = selected ? selected.dataset.code : "";
-    checkDuplicateEntry(col, duplicateHint);
-    updateSummary();
-  });
+    if (selected) {
+      codeInput.value = selected.dataset.code;
 
-  // فحص التكرار والانتهاء
-  expiryInput.addEventListener("input", () => {
-    checkDuplicateEntry(col, duplicateHint);
-    checkExpiryStatus(expiryInput.value, expiryInput);
+      // استخرج عدد البواكت من اسم المنتج
+      const packs = extractPacksPerCarton(selected.value);
+      if (packs) {
+        unitInput.value = packs + " باكت/كرتون";
+      } else {
+        unitInput.value = "غير محدد";
+      }
+    } else {
+      codeInput.value = "";
+      unitInput.value = "";
+    }
+    updateSummary();
   });
 
   // حذف البطاقة
@@ -190,74 +177,9 @@ function addProductRow() {
   // تحديث الملخص عند تغيير الكميات
   cartonsInput.addEventListener("input", updateSummary);
   packsInput.addEventListener("input", updateSummary);
+  expiryInput.addEventListener("input", updateSummary);
 
   updateSummary();
-}
-
-// فحص تكرار نفس المنتج بنفس الوحدة وتاريخ الانتهاء
-function checkDuplicateEntry(currentCol, hintEl) {
-  const salesRep = document.getElementById("salesRep").value.trim();
-  const customerCode = document.getElementById("customer_code").value.trim();
-
-  const currentCode = currentCol.querySelector(".product-code").value.trim();
-  const currentExpiry = currentCol.querySelector(".expiry-input").value;
-  const currentUnit = currentCol.querySelector(".unit-input").value.trim();
-
-  if (!salesRep || !customerCode || !currentCode || !currentExpiry || !currentUnit) {
-    hintEl.classList.add("d-none");
-    hintEl.textContent = "";
-    return;
-  }
-
-  const cards = document.querySelectorAll(".product-card");
-  let foundMatch = false;
-
-  cards.forEach(card => {
-    if (card === currentCol) return;
-
-    const code = card.querySelector(".product-code").value.trim();
-    const expiry = card.querySelector(".expiry-input").value;
-    const unit = card.querySelector(".unit-input").value.trim();
-
-    if (code === currentCode && expiry === currentExpiry && unit === currentUnit) {
-      foundMatch = true;
-    }
-  });
-
-  if (foundMatch) {
-    hintEl.classList.remove("d-none");
-    hintEl.textContent = "⚠️ هذا المنتج بنفس الوحدة وتاريخ الانتهاء مكرر بالفعل.";
-  } else {
-    hintEl.classList.add("d-none");
-    hintEl.textContent = "";
-  }
-}
-
-// فحص حالة تاريخ الانتهاء وإظهار تنبيه بسيط
-function checkExpiryStatus(expiryValue, inputEl) {
-  if (!expiryValue) {
-    inputEl.classList.remove("is-invalid", "is-warning", "is-valid");
-    return;
-  }
-  const today = new Date();
-  const expiry = new Date(expiryValue);
-
-  // إزالة أي حالة سابقة
-  inputEl.classList.remove("is-invalid", "is-warning", "is-valid");
-
-  if (expiry < today) {
-    inputEl.classList.add("is-invalid"); // منتهي
-    inputEl.title = "تاريخ منتهي";
-  } else {
-    const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 30) {
-      inputEl.classList.add("is-warning"); // قريب الانتهاء (تحتاج CSS يدعمه)
-      inputEl.title = "قريب الانتهاء خلال 30 يوم";
-    } else {
-      inputEl.classList.add("is-valid"); // سليم
-      inputEl.title = "تاريخ صالح";
-    }
-  }
 }
 
 // ملخص مباشر للكميات
@@ -273,6 +195,7 @@ function updateSummary() {
     totalPacks += packs;
   });
 
+  const liveSummary = document.getElementById("liveSummary");
   if (cards.length === 0) {
     liveSummary.classList.add("d-none");
     liveSummary.textContent = "";
@@ -284,6 +207,7 @@ function updateSummary() {
     <strong>الملخص:</strong> عدد المنتجات: ${cards.length} — إجمالي الكراتين: ${totalCartons} — إجمالي الباكِت: ${totalPacks}
   `;
 }
+
 // بناء معاينة قبل الإرسال في المودال
 function buildPreview() {
   const previewContainer = document.getElementById("previewContainer");
@@ -363,23 +287,14 @@ function validateForm() {
 
   const customerCode = document.getElementById("customer_code").value.trim();
   if (!customerCode) {
-    showMsg("error", "رجاءً اختر العميل من القائمة حتى يظهر كوده.");
+    alert("رجاءً اختر العميل من القائمة حتى يظهر كوده.");
     return false;
   }
 
   const cards = document.querySelectorAll(".product-card");
   if (cards.length === 0) {
-    showMsg("error", "أضف منتجًا واحدًا على الأقل للجرد.");
+    alert("أضف منتجًا واحدًا على الأقل للجرد.");
     return false;
-  }
-
-  // منع وجود تاريخ منتهي
-  for (const card of cards) {
-    const expiry = card.querySelector(".expiry-input").value;
-    if (expiry && new Date(expiry) < new Date()) {
-      showMsg("error", "يوجد منتج بتاريخ انتهاء منتهي. عدّل التاريخ.");
-      return false;
-    }
   }
 
   return true;
@@ -424,12 +339,12 @@ async function postData(data) {
       body: JSON.stringify(data)
     });
 
+    // يجب أن يعيد Google Apps Script استجابة JSON للنجاح/الفشل
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const result = await res.json();
 
-    // توقع أن GAS يعيد { success: true, message: "..." }
     if (result.success) {
-      showMsg("success", result.message || "تم إرسال البيانات بنجاح.");
+      alert("✅ تم إرسال البيانات بنجاح");
       form.reset();
       document.getElementById("productsBody").innerHTML = "";
       productIndex = 0;
@@ -437,17 +352,16 @@ async function postData(data) {
       setDefaultDateTime();
       updateSummary();
     } else {
-      showMsg("error", result.message || "تعذر الإرسال. حاول مرة أخرى.");
+      alert("❌ تعذر الإرسال: " + (result.message || ""));
     }
   } catch (err) {
     console.error("خطأ الإرسال:", err);
-    showMsg("error", "تعذر الاتصال بالخادم. تحقق من رابط Google Apps Script والصلاحيات.");
+    alert("⚠️ تعذر الاتصال بالخادم. تحقق من رابط Google Apps Script و من إعدادات CORS.");
   }
 }
 
 // ربط الأحداث
 document.addEventListener("DOMContentLoaded", () => {
-  setDefaultDateTime();
   loadData();
 
   addProductBtn.addEventListener("click", addProductRow);
@@ -463,14 +377,18 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.show();
 
     const confirmBtn = document.getElementById("confirmSendBtn");
+    // يجب استخدام دالة واحدة فقط لمعالجة النقر، لتجنب الإرسال المتعدد
     const onConfirm = async () => {
+      // إزالة المعالج قبل الإرسال لمنع النقر المزدوج
+      confirmBtn.removeEventListener("click", onConfirm); 
+      
       modal.hide();
-      confirmBtn.removeEventListener("click", onConfirm);
       const data = serializeFormData();
       await postData(data);
+
+      // إعادة إضافة المعالج استعداداً للنموذج التالي (أو إعادة تحميل الصفحة)
+      // في هذه الحالة نعتمد على إعادة التحميل بعد الـ form.reset()
     };
-    // منع التكرار
-    confirmBtn.removeEventListener("click", onConfirm);
     confirmBtn.addEventListener("click", onConfirm);
   });
 });
