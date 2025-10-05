@@ -1,7 +1,7 @@
 /* script.js */
 
 // ✅ رابط Google Apps Script (المُرسَل والمُعتمد الآن)
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkoTCwAy9qWp0yelFhBC1QpXT_cmiE-Kosu5NgdU1rfoSfxVmuEHIlSA2PU_dPshSU/exec";
 
 // ثوابت تحميل البيانات (يفترض وجود هذه الملفات بجانب ملف HTML)
 const PRODUCTS_JSON_URL = "products.json";
