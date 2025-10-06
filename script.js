@@ -1,4 +1,4 @@
-// script.js - الكود الكامل والنهائي
+// script.js - الكود الموحد والنهائي مع كل التحديثات
 
 // ===================================================
 // 1. الإعدادات والمتغيرات العالمية
@@ -62,22 +62,27 @@ function showMsg(msg, error = false) {
 function updateExpiryColor(inputElement) {
     const expiryDate = new Date(inputElement.value);
     const today = new Date();
+    // 3 أشهر
     const threeMonths = new Date();
     threeMonths.setMonth(today.getMonth() + 3);
 
     // إزالة جميع الفئات السابقة
     inputElement.classList.remove('expiry-red', 'expiry-yellow', 'expiry-green');
 
-    if (isNaN(expiryDate)) {
-        return; // لا يوجد تاريخ مدخل
+    if (isNaN(expiryDate.getTime())) {
+        return; 
     }
+    
+    // لضمان مقارنة اليوم بالتاريخ وليس بالوقت
+    today.setHours(0, 0, 0, 0);
+    expiryDate.setHours(0, 0, 0, 0);
 
-    // 🔴 أحمر: انتهى أو يتبقى أقل من شهر واحد
-    if (expiryDate <= today) {
+    // 🔴 أحمر: انتهى أو يتبقى أقل من شهر واحد (30 يوم)
+    if (expiryDate.getTime() < today.getTime() || (expiryDate.getTime() - today.getTime()) / (1000 * 3600 * 24) <= 30) {
         inputElement.classList.add('expiry-red');
     } 
     // 🟡 أصفر: يتبقى من شهر إلى ثلاثة أشهر
-    else if (expiryDate < threeMonths) {
+    else if (expiryDate.getTime() <= threeMonths.getTime()) {
         inputElement.classList.add('expiry-yellow');
     }
     // 🟢 أخضر: يتبقى أكثر من ثلاثة أشهر
@@ -85,14 +90,6 @@ function updateExpiryColor(inputElement) {
         inputElement.classList.add('expiry-green');
     }
 }
-
-// يُفترض أنك قمت بإضافة تنسيقات CSS التالية إلى ملف الستايل (style.css):
-/*
-.expiry-red { background-color: #ffcccc; color: #cc0000; font-weight: bold; }
-.expiry-yellow { background-color: #ffebcc; color: #cc6600; }
-.expiry-green { background-color: #ccffcc; color: #008000; }
-*/
-
 
 // ===================================================
 // 4. دوال تحميل البيانات وتعبئة القوائم الرئيسية
@@ -107,7 +104,9 @@ async function fillSelects() {
         ]);
 
         CUSTOMERS = customersData;
+        PRODUCTS = await loadJSON('products.json'); // تحميل المنتجات هنا أيضًا
 
+        // تعبئة المندوبين والمحافظات
         const salesRepSelect = document.getElementById('salesRep');
         salesReps.forEach(repName => {
             salesRepSelect.appendChild(new Option(repName, repName));
@@ -118,6 +117,7 @@ async function fillSelects() {
             governorateSelect.appendChild(new Option(govName, govName));
         });
 
+        // تعبئة قائمة العملاء
         const customersList = document.getElementById('customersList');
         CUSTOMERS.forEach(cust => {
             const opt = document.createElement('option');
@@ -125,6 +125,7 @@ async function fillSelects() {
             customersList.appendChild(opt);
         });
 
+        // ربط حقل العميل بجلب الكود
         document.getElementById('customer').addEventListener('input', function() {
             const name = this.value;
             const found = CUSTOMERS.find(c => c.Customer_Name_AR === name);
@@ -137,14 +138,6 @@ async function fillSelects() {
     }
 }
 
-async function prepareProducts() {
-    try {
-        PRODUCTS = await loadJSON('products.json');
-    } catch (err) {
-        showMsg(err.message + " يرجى التأكد من ملف products.json.", true);
-        throw err;
-    }
-}
 
 // ===================================================
 // 5. دوال التعامل مع بطاقات المنتجات
@@ -153,7 +146,7 @@ async function prepareProducts() {
 function addProductRow() {
     const productsBody = document.getElementById('productsBody');
     const productCard = document.createElement('div');
-    productCard.classList.add('col-12'); 
+    productCard.classList.add('col-12', 'mb-3'); 
     
     let options = '<option value="">اختر المنتج...</option>';
     PRODUCTS.forEach(prod => {
@@ -205,8 +198,8 @@ function addProductRow() {
         </div>
     `;
     productsBody.appendChild(productCard);
-    
-    // ربط الدوال بالمدخلات
+
+    // ربط الدالة بمدخل اسم المنتج لجلب الكود والفئة
     productCard.querySelector('.prod-name').addEventListener('change', function(){
         const name = this.value;
         const prod = PRODUCTS.find(p => p.Product_Name_AR === name);
@@ -214,9 +207,9 @@ function addProductRow() {
         productCard.querySelector('.prod-cat').value = prod ? prod.Category : '';
     });
     
-    // ربط دالة التلوين الشرطي بتاريخ الانتهاء
+    // 🛑 ربط دالة التلوين الشرطي بتاريخ الانتهاء
     const expiryInput = productCard.querySelector('.prod-expiry');
-    expiryInput.addEventListener('change', function() {
+    expiryInput.addEventListener('input', function() {
         updateExpiryColor(this);
     });
 }
@@ -237,7 +230,6 @@ function removeProductRow(btn) {
 function validateForm() {
     const form = document.getElementById('inventoryForm');
     
-    // ... (منطق التحقق من الأوقات والكود بدون تغيير)
     let exitTime = document.getElementById('exit_time').value;
     if (!exitTime) {
         exitTime = formatTime(new Date());
@@ -260,7 +252,7 @@ function validateForm() {
         return false;
     }
 
-    // 🛑 التحقق من الكميات
+    // 🛑 منطق التحقق من الكميات
     const productsBody = document.getElementById('productsBody');
     const productCards = productsBody.children;
 
@@ -279,7 +271,7 @@ function validateForm() {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يرجى اختيار اسم المنتج.`, true);
             allProductsValid = false;
         } 
-        // 🛑 منطق التأكد من العبوة (ألا تكون الكمية صفراً لكلا الصنفين)
+        // التحقق من العبوة (ألا تكون الكمية صفراً لكلا الصنفين)
         else if (carton === 0 && packet === 0) {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يجب إدخال كمية (كرتون أو باكت) أكبر من الصفر.`, true);
             allProductsValid = false;
@@ -303,10 +295,11 @@ function collectData() {
     
     // 🛑 ضبط أسماء الحقول لتطابق الأعمدة الجديدة/المتوقعة في Sheet
     data.customer = document.getElementById('customer').value;
+    // الحقول الإضافية التي قد تكون غير موجودة في النموذج ولكنها مطلوبة في Sheet
     data.address_city = document.getElementById('address_city')?.value || '';
     data.suggestions = document.getElementById('suggestions')?.value || '';
     data.region = document.getElementById('region')?.value || '';
-    data.notes = document.getElementById('notes')?.value || ''; // تم تغيير customernotes إلى notes
+    data.notes = document.getElementById('notes')?.value || ''; 
 
     // 2. جمع بيانات المنتجات في مصفوفة منفصلة
     document.getElementById('productsBody').querySelectorAll('.col-12').forEach(productCard => { 
@@ -333,10 +326,12 @@ async function sendData(data) {
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
+            // 🛑 مهم: إرسال JSON Body
             headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify(data),
+            body: JSON.stringify(data), 
         });
         
+        // نظرًا لأننا نستخدم Apps Script، نحاول قراءة الرد كنص عادي
         const txt = await res.text();
 
         if (res.ok && txt.includes("Success")) {
@@ -368,23 +363,29 @@ document.getElementById('inventoryForm').addEventListener('submit', async functi
     await sendData(dataToSend);
 });
 
-// بداية التحميل
+// بداية التحميل - يتم استدعاء الدوال عند تحميل الصفحة بالكامل
 window.addEventListener('DOMContentLoaded', async function() {
     try {
+        // 1. تسجيل التاريخ ووقت الدخول التلقائي (وقت فتح الرابط)
         const now = new Date();
         const initialTime = formatTime(now);
         const initialDate = formatDate(now);
         
         document.getElementById('visit_time').value = initialTime;
         document.getElementById('visit_date').value = initialDate;
+        document.getElementById('exit_time').value = initialTime; // يتم تعيين وقت الخروج مبدئيا نفس وقت الدخول
 
-        await prepareProducts(); 
+        // 2. تحميل البيانات
         await fillSelects(); 
         
+        // 3. إضافة أول بطاقة منتج
         if (PRODUCTS.length > 0) {
             addProductRow(); 
         }
     } catch (e) {
         console.error("فشل التحميل الأولي للبيانات:", e);
     }
+    
+    // ربط زر الإضافة بالدالة
+    document.getElementById('addProductBtn')?.addEventListener('click', addProductRow);
 });
