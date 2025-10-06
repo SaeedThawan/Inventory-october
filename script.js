@@ -5,7 +5,7 @@
 // ===================================================
 
 // يرجى تحديث هذا الرابط برابط Web App الخاص بك في Google Apps Script
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-lQEIp50L0lf67_tYOX42VBBJH39Yh07A7xxP4k08AfxKkb9L5xFFBinPvpvGA_fI/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkoTCwAy9qWp0yelFhBC1QpXT_cmiE-Kosu5NgdU1rfoSfxVmuEHIlSA2PU_dPshSU/exec";
 
 let PRODUCTS = [];
 let CUSTOMERS = []; 
@@ -357,3 +357,4 @@ window.addEventListener('DOMContentLoaded', async function() {
         console.error("فشل التحميل الأولي للبيانات:", e);
     }
 });
+
