@@ -1,77 +1,66 @@
-/* 🌙 خلفية عامة */
+/* style.css */
+
 body {
-  background-color: #f8f9fa;
-  font-family: "Tahoma", "Arial", sans-serif;
+    font-family: 'Arial', sans-serif; 
 }
 
-/* 🟦 رأس الكارد */
-.card-header {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-/* 🟩 بطاقات المنتجات */
-.product-card .card {
-  border-right: 5px solid #0d6efd; /* خط جانبي أزرق */
-  transition: transform 0.2s ease-in-out;
-}
-.product-card .card:hover {
-  transform: scale(1.02);
-}
-
-/* --- التعديلات لضمان التوافق مع script.js --- */
-
-/* 🟨 خانة التحذير (قريب الانتهاء): توافق مع 'expiry-yellow' */
-.expiry-yellow {
-  border-color: orange !important;
-  background-color: #fff8e1 !important;
-}
-
-/* 🟢 خانة صالحة: توافق مع 'expiry-green' */
-.expiry-green {
-  border-color: #198754 !important;
-  background-color: #e9f7ef !important;
-}
-
-/* 🔴 خانة منتهية/قريبة جداً: توافق مع 'expiry-red' */
-.expiry-red {
-  border-color: #dc3545 !important;
-  background-color: #f8d7da !important;
-}
-
-/* 💬 رسائل التنبيه (تركت كما هي) */
+/* تحسين شكل الرسائل */
 .msg {
-  padding: 10px;
-  border-radius: 5px;
-  font-weight: bold;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .msg.success {
-  background: #d1e7dd;
-  color: #0f5132;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
+
 .msg.error {
-  background: #f8d7da;
-  color: #842029;
-}
-.msg.info {
-  background: #cff4fc;
-  color: #055160;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
-/* 📊 الملخص المباشر */
-#liveSummary {
-  font-weight: bold;
-  font-size: 0.95rem;
-  border-left: 5px solid #6c757d;
+/* تخصيص البطاقة الرئيسية */
+.card {
+    border-radius: 15px;
 }
 
-/* 📝 textarea */
-textarea.form-control {
-  resize: vertical;
+/* ---------------------------------- */
+/* أنماط بطاقات المنتجات الجديدة (الجرد) */
+/* ---------------------------------- */
+
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px; 
+    border-left: 5px solid var(--bs-primary); /* شريط جانبي أنيق */
 }
 
-/* 🔘 زر إضافة منتج */
+/* تأثير عند المرور أو التركيز (للفخامة) */
+.product-card:hover {
+    transform: translateY(-3px); /* ارتفاع بسيط */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important; 
+}
+
+/* تصميم الزر لإضافة المنتج */
 .add-product-btn {
-  font-size: 0.85rem;
-  padding: 4px 10px;
+    border-radius: 20px; 
+    font-weight: bold;
+}
+
+/* تنسيق حقول الإدخال في البطاقات */
+.product-card .form-control, .product-card .form-select {
+    font-size: 0.95rem;
+}
+
+/* حقول القراءة فقط */
+.product-card input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-weight: bold;
 }
