@@ -1,75 +1,77 @@
 /* 🌙 خلفية عامة */
 body {
-  background-color: #f8f9fa;
-  font-family: "Tahoma", "Arial", sans-serif;
+  background-color: #f8f9fa;
+  font-family: "Tahoma", "Arial", sans-serif;
 }
 
 /* 🟦 رأس الكارد */
 .card-header {
-  font-weight: bold;
-  font-size: 1.2rem;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 /* 🟩 بطاقات المنتجات */
 .product-card .card {
-  border-right: 5px solid #0d6efd; /* خط جانبي أزرق */
-  transition: transform 0.2s ease-in-out;
+  border-right: 5px solid #0d6efd; /* خط جانبي أزرق */
+  transition: transform 0.2s ease-in-out;
 }
 .product-card .card:hover {
-  transform: scale(1.02);
+  transform: scale(1.02);
 }
 
-/* 🟨 خانة التحذير (قريب الانتهاء) */
-.is-warning {
-  border-color: orange !important;
-  background-color: #fff8e1 !important;
+/* --- التعديلات لضمان التوافق مع script.js --- */
+
+/* 🟨 خانة التحذير (قريب الانتهاء): توافق مع 'expiry-yellow' */
+.expiry-yellow {
+  border-color: orange !important;
+  background-color: #fff8e1 !important;
 }
 
-/* 🟢 خانة صالحة */
-.is-valid {
-  border-color: #198754 !important;
-  background-color: #e9f7ef !important;
+/* 🟢 خانة صالحة: توافق مع 'expiry-green' */
+.expiry-green {
+  border-color: #198754 !important;
+  background-color: #e9f7ef !important;
 }
 
-/* 🔴 خانة منتهية */
-.is-invalid {
-  border-color: #dc3545 !important;
-  background-color: #f8d7da !important;
+/* 🔴 خانة منتهية/قريبة جداً: توافق مع 'expiry-red' */
+.expiry-red {
+  border-color: #dc3545 !important;
+  background-color: #f8d7da !important;
 }
 
-/* 💬 رسائل التنبيه */
+/* 💬 رسائل التنبيه (تركت كما هي) */
 .msg {
-  padding: 10px;
-  border-radius: 5px;
-  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
 }
 .msg.success {
-  background: #d1e7dd;
-  color: #0f5132;
+  background: #d1e7dd;
+  color: #0f5132;
 }
 .msg.error {
-  background: #f8d7da;
-  color: #842029;
+  background: #f8d7da;
+  color: #842029;
 }
 .msg.info {
-  background: #cff4fc;
-  color: #055160;
+  background: #cff4fc;
+  color: #055160;
 }
 
 /* 📊 الملخص المباشر */
 #liveSummary {
-  font-weight: bold;
-  font-size: 0.95rem;
-  border-left: 5px solid #6c757d;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border-left: 5px solid #6c757d;
 }
 
 /* 📝 textarea */
 textarea.form-control {
-  resize: vertical;
+  resize: vertical;
 }
 
 /* 🔘 زر إضافة منتج */
 .add-product-btn {
-  font-size: 0.85rem;
-  padding: 4px 10px;
+  font-size: 0.85rem;
+  padding: 4px 10px;
 }
