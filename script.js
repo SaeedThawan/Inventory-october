@@ -4,14 +4,14 @@
 // 1. الإعدادات والمتغيرات العالمية
 // ===================================================
 
-// يرجى تحديث هذا الرابط برابط Web App الخاص بك في Google Apps Script
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkoTCwAy9qWp0yelFhBC1QpXT_cmiE-Kosu5NgdU1rfoSfxVmuEHIlSA2PU_dPshSU/exec";
+// 🛑 يرجى التأكد من أن هذا الرابط هو الرابط الصحيح والنهائي بعد النشر
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkoTCwAy9qWp0yelFhBC1QpXT_cmiE-Kosu5NgdU1rfoSfxVmuEHIlSA2PU_dPshSU/exec"; 
 
 let PRODUCTS = [];
 let CUSTOMERS = []; 
 
 // ===================================================
-// 2. دوال مساعدة (تنسيق الوقت والتاريخ)
+// 2. دوال مساعدة (التاريخ، الرسائل، تحميل JSON)
 // ===================================================
 
 function formatTime(date) {
@@ -27,23 +27,16 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-// ... (بقية دوال loadJSON و showMsg تبقى كما هي) ...
-
 async function loadJSON(file) {
     try {
         const res = await fetch(file, {cache: "no-store"}); 
         if (!res.ok) {
-            console.error(`ERROR 404: File not found or failed status for ${file}`);
             throw new Error(`لم يتم العثور على الملف: ${file}`);
         }
-        
         const data = await res.json();
-        
         if (!Array.isArray(data)) {
-            console.error(`ERROR: JSON in ${file} is not an array.`);
             throw new Error(`خطأ: تنسيق البيانات في ${file} غير صحيح (ليس مصفوفة).`);
         }
-        
         return data;
     } catch (error) {
         console.error(`FATAL ERROR loading ${file}:`, error);
@@ -63,30 +56,66 @@ function showMsg(msg, error = false) {
 }
 
 // ===================================================
-// 3. دوال تحميل البيانات وتعبئة القوائم الرئيسية
+// 3. دوال التعامل مع التلوين الشرطي للتواريخ 🎨
+// ===================================================
+
+function updateExpiryColor(inputElement) {
+    const expiryDate = new Date(inputElement.value);
+    const today = new Date();
+    const threeMonths = new Date();
+    threeMonths.setMonth(today.getMonth() + 3);
+
+    // إزالة جميع الفئات السابقة
+    inputElement.classList.remove('expiry-red', 'expiry-yellow', 'expiry-green');
+
+    if (isNaN(expiryDate)) {
+        return; // لا يوجد تاريخ مدخل
+    }
+
+    // 🔴 أحمر: انتهى أو يتبقى أقل من شهر واحد
+    if (expiryDate <= today) {
+        inputElement.classList.add('expiry-red');
+    } 
+    // 🟡 أصفر: يتبقى من شهر إلى ثلاثة أشهر
+    else if (expiryDate < threeMonths) {
+        inputElement.classList.add('expiry-yellow');
+    }
+    // 🟢 أخضر: يتبقى أكثر من ثلاثة أشهر
+    else {
+        inputElement.classList.add('expiry-green');
+    }
+}
+
+// يُفترض أنك قمت بإضافة تنسيقات CSS التالية إلى ملف الستايل (style.css):
+/*
+.expiry-red { background-color: #ffcccc; color: #cc0000; font-weight: bold; }
+.expiry-yellow { background-color: #ffebcc; color: #cc6600; }
+.expiry-green { background-color: #ccffcc; color: #008000; }
+*/
+
+
+// ===================================================
+// 4. دوال تحميل البيانات وتعبئة القوائم الرئيسية
 // ===================================================
 
 async function fillSelects() {
     try {
         const [salesReps, governorates, customersData] = await Promise.all([
             loadJSON('sales_representatives.json'), 
-            loadJSON('governorates.json'),         
-            loadJSON('customers_main.json'),       
+            loadJSON('governorates.json'), 
+            loadJSON('customers_main.json'), 
         ]);
 
         CUSTOMERS = customersData;
 
-        // ... (تعبئة المندوبين والمحافظات كما هي) ...
         const salesRepSelect = document.getElementById('salesRep');
         salesReps.forEach(repName => {
-            const opt = new Option(repName, repName); 
-            salesRepSelect.appendChild(opt);
+            salesRepSelect.appendChild(new Option(repName, repName));
         });
 
         const governorateSelect = document.getElementById('governorate');
         governorates.forEach(govName => {
-            const opt = new Option(govName, govName); 
-            governorateSelect.appendChild(opt);
+            governorateSelect.appendChild(new Option(govName, govName));
         });
 
         const customersList = document.getElementById('customersList');
@@ -96,11 +125,9 @@ async function fillSelects() {
             customersList.appendChild(opt);
         });
 
-        // ربط حقل العميل بجلب الكود (يتم إدخاله في الحقل المخفي)
         document.getElementById('customer').addEventListener('input', function() {
             const name = this.value;
             const found = CUSTOMERS.find(c => c.Customer_Name_AR === name);
-            // 💡 يتم تحديث الحقل المخفي (customer_code)
             document.getElementById('customer_code').value = found ? found.Customer_Code : '';
         });
         
@@ -120,7 +147,7 @@ async function prepareProducts() {
 }
 
 // ===================================================
-// 4. دوال التعامل مع بطاقات المنتجات (بدون تغيير)
+// 5. دوال التعامل مع بطاقات المنتجات
 // ===================================================
 
 function addProductRow() {
@@ -178,54 +205,62 @@ function addProductRow() {
         </div>
     `;
     productsBody.appendChild(productCard);
-
+    
+    // ربط الدوال بالمدخلات
     productCard.querySelector('.prod-name').addEventListener('change', function(){
         const name = this.value;
         const prod = PRODUCTS.find(p => p.Product_Name_AR === name);
         productCard.querySelector('.prod-code').value = prod ? prod.Product_Code : '';
         productCard.querySelector('.prod-cat').value = prod ? prod.Category : '';
     });
+    
+    // ربط دالة التلوين الشرطي بتاريخ الانتهاء
+    const expiryInput = productCard.querySelector('.prod-expiry');
+    expiryInput.addEventListener('change', function() {
+        updateExpiryColor(this);
+    });
 }
 
 function removeProductRow(btn) {
-    btn.closest('.col-12').remove();
+    const productsBody = document.getElementById('productsBody');
+    if (productsBody.children.length > 1) {
+         btn.closest('.col-12').remove();
+    } else {
+        showMsg("يجب أن يبقى منتج واحد على الأقل في القائمة.", true);
+    }
 }
 
 // ===================================================
-// 5. دوال التحقق والإرسال (تم التعديل)
+// 6. دوال التحقق والإرسال (منطق JSON Body)
 // ===================================================
 
 function validateForm() {
     const form = document.getElementById('inventoryForm');
     
-    // 1. إذا كان وقت الخروج فارغاً، يتم تعبئته تلقائياً بالوقت الحالي
+    // ... (منطق التحقق من الأوقات والكود بدون تغيير)
     let exitTime = document.getElementById('exit_time').value;
     if (!exitTime) {
         exitTime = formatTime(new Date());
         document.getElementById('exit_time').value = exitTime;
     }
 
-    // 2. التحقق من صلاحية حقول النموذج الرئيسية
     if (!form.checkValidity()) {
         form.reportValidity();
         return false;
     }
 
-    // 3. التحقق من وجود كود العميل (في الحقل المخفي)
     if (!document.getElementById('customer_code').value) {
         showMsg("يرجى اختيار العميل لتعبئة كود العميل تلقائياً!", true);
         return false;
     }
     
-    // 4. التحقق من تسلسل الأوقات (الخروج يجب أن يكون بعد الدخول)
     const visitTime = document.getElementById('visit_time').value;
-
     if (exitTime <= visitTime) {
         showMsg("خطأ في الأوقات: يجب أن يكون وقت الخروج بعد وقت الدخول.", true);
         return false;
     }
 
-    // 5. التحقق من تعبئة جميع بيانات المنتجات المطلوبة
+    // 🛑 التحقق من الكميات
     const productsBody = document.getElementById('productsBody');
     const productCards = productsBody.children;
 
@@ -243,7 +278,9 @@ function validateForm() {
         if (!prodName) {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يرجى اختيار اسم المنتج.`, true);
             allProductsValid = false;
-        } else if (carton === 0 && packet === 0) {
+        } 
+        // 🛑 منطق التأكد من العبوة (ألا تكون الكمية صفراً لكلا الصنفين)
+        else if (carton === 0 && packet === 0) {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يجب إدخال كمية (كرتون أو باكت) أكبر من الصفر.`, true);
             allProductsValid = false;
         }
@@ -252,74 +289,71 @@ function validateForm() {
     return allProductsValid;
 }
 
-function collectRows() {
+// 💡 دالة لتجميع البيانات في كائن JSON واحد (يتضمن مصفوفة المنتجات)
+function collectData() {
     const form = document.getElementById('inventoryForm');
     const fd = new FormData(form);
-    const commonData = {};
+    const data = {};
+    const productsArray = [];
     
+    // 1. جمع بيانات الزيارة المشتركة
     for (let [key, val] of fd.entries()) {
-         commonData[key] = val;
+        data[key] = val;
     }
-
-    const resultRows = [];
-    const productsBody = document.getElementById('productsBody');
     
-    productsBody.querySelectorAll('.col-12').forEach(productCard => { 
-        const row = { ...commonData };
+    // 🛑 ضبط أسماء الحقول لتطابق الأعمدة الجديدة/المتوقعة في Sheet
+    data.customer = document.getElementById('customer').value;
+    data.address_city = document.getElementById('address_city')?.value || '';
+    data.suggestions = document.getElementById('suggestions')?.value || '';
+    data.region = document.getElementById('region')?.value || '';
+    data.notes = document.getElementById('notes')?.value || ''; // تم تغيير customernotes إلى notes
+
+    // 2. جمع بيانات المنتجات في مصفوفة منفصلة
+    document.getElementById('productsBody').querySelectorAll('.col-12').forEach(productCard => { 
+        const product = {};
         
-        row.product_name = productCard.querySelector('.prod-name').value;
-        row.product_code = productCard.querySelector('.prod-code').value;
-        row.product_category = productCard.querySelector('.prod-cat').value;
-        row.carton_qty = productCard.querySelector('.prod-carton').value || "0";
-        row.packet_qty = productCard.querySelector('.prod-packet').value || "0";
-        row.expiry_date = productCard.querySelector('.prod-expiry').value;
+        product.product_name = productCard.querySelector('.prod-name').value;
+        product.product_code = productCard.querySelector('.prod-code').value;
+        product.product_category = productCard.querySelector('.prod-cat').value;
+        product.carton_qty = productCard.querySelector('.prod-carton').value || "0";
+        product.packet_qty = productCard.querySelector('.prod-packet').value || "0";
+        product.expiry_date = productCard.querySelector('.prod-expiry').value;
         
-        resultRows.push(row);
+        productsArray.push(product);
     });
-    return resultRows;
+    
+    // 3. دمج البيانات المشتركة مع مصفوفة المنتجات
+    data.products = productsArray;
+    
+    return data;
 }
 
-// ... (دوال sendRows ومستمعات الأحداث كما هي) ...
+// 💡 دالة لإرسال طلب POST واحد بجسم JSON
+async function sendData(data) {
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify(data),
+        });
+        
+        const txt = await res.text();
 
-async function sendRows(rows) {
-    let success = 0, failed = 0;
-    const total = rows.length;
-
-    for (let row of rows) {
-        try {
-            const formBody = Object.keys(row).map(key => 
-                encodeURIComponent(key) + "=" + encodeURIComponent(row[key])
-            ).join("&");
-
-            const res = await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formBody,
-            });
-            
-            const txt = await res.text();
-
-            if (res.ok && (txt.includes("تم إرسال البيانات") || txt.includes("Success"))) {
-                success++;
-            } else {
-                console.error("خطأ في إرسال صف:", row.product_name, "الاستجابة:", txt);
-                failed++;
-            }
-        } catch (err) {
-            console.error("خطأ شبكة/إرسال:", err);
-            failed++;
+        if (res.ok && txt.includes("Success")) {
+            showMsg(`✅ تم إرسال البيانات بنجاح! (${data.products.length} منتجات)`);
+            document.getElementById('inventoryForm').reset();
+            document.getElementById('productsBody').innerHTML = "";
+            addProductRow(); 
+            return true;
+        } else {
+            console.error("خطأ في الإرسال:", txt);
+            showMsg("❌ فشل الإرسال! يرجى مراجعة سجل الأخطاء والتحقق من Apps Script.", true);
+            return false;
         }
-    }
-
-    if (success === total) {
-        showMsg(`✅ تم إرسال جميع المنتجات (${success}) بنجاح!`);
-        document.getElementById('inventoryForm').reset();
-        document.getElementById('productsBody').innerHTML = "";
-        addProductRow(); 
-    } else if (success > 0 && failed > 0) {
-        showMsg(`⚠️ تم إرسال ${success} منتج بنجاح، وحدثت مشكلة في ${failed} منتج. يرجى مراجعة سجل الأخطاء.`, true);
-    } else {
-        showMsg("❌ لم يتم إرسال أي بيانات بنجاح. حاول مجددًا.", true);
+    } catch (err) {
+        console.error("خطأ شبكة/إرسال:", err);
+        showMsg("❌ خطأ في الاتصال بالشبكة أو بخادم Google Apps Script.", true);
+        return false;
     }
 }
 
@@ -330,14 +364,13 @@ document.getElementById('inventoryForm').addEventListener('submit', async functi
     
     showMsg("⏳ يتم الآن إرسال البيانات، يرجى الانتظار...");
     
-    const rows = collectRows();
-    await sendRows(rows);
+    const dataToSend = collectData();
+    await sendData(dataToSend);
 });
 
-// بداية التحميل - يتم استدعاء الدوال عند تحميل الصفحة بالكامل
+// بداية التحميل
 window.addEventListener('DOMContentLoaded', async function() {
     try {
-        // 1. تسجيل التاريخ ووقت الدخول التلقائي (وقت فتح الرابط)
         const now = new Date();
         const initialTime = formatTime(now);
         const initialDate = formatDate(now);
@@ -345,11 +378,9 @@ window.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('visit_time').value = initialTime;
         document.getElementById('visit_date').value = initialDate;
 
-        // 2. تحميل البيانات
         await prepareProducts(); 
-        await fillSelects();     
+        await fillSelects(); 
         
-        // 3. إضافة أول بطاقة منتج
         if (PRODUCTS.length > 0) {
             addProductRow(); 
         }
@@ -357,4 +388,3 @@ window.addEventListener('DOMContentLoaded', async function() {
         console.error("فشل التحميل الأولي للبيانات:", e);
     }
 });
-
